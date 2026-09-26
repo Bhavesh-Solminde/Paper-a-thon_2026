@@ -28,19 +28,42 @@ const IMAGE_ENDPOINT = process.env.HF_IMAGE_ENDPOINT || "higgsfield-ai/soul/v2/s
 const VIDEO_ENDPOINT = process.env.HF_VIDEO_ENDPOINT || "/v1/image2video/dop";
 const VIDEO_MODEL = process.env.HF_VIDEO_MODEL || "dop-turbo";
 
-// No lettering: image models garble text, and the site draws the real title on top anyway.
-// No lettering: image models garble text, and the site draws the real title on top anyway.
-const KEYFRAME_PROMPT =
-  "Cinematic macro photograph, pitch-black background. A loose stack of crumpled off-white paper sheets with " +
-  "torn, jagged, fibrous edges lies at the centre of a dark desk, one sheet partly ripped open. Electric-blue " +
-  "(#1f6bff) rim light grazes the torn edges; abstract blue ink brush strokes and splatters on the paper. " +
-  "Absolutely no text, no letters, no words, no numbers, no writing. Moody, high contrast, subtle film grain, " +
-  "shallow depth of field, lots of negative space around the subject, centered composition.";
-
-const MOTION_PROMPT =
-  "Slow cinematic push-in toward the paper stack. The sheets lift and flutter as if caught by a breeze, " +
-  "electric-blue light sweeps across the torn edges, then the top sheet rips apart down the middle and small " +
-  "paper scraps drift toward the camera. Smooth, dramatic, no text.";
+// Two concepts, each one continuous shot that ends in dark blue so the last frame hands off to the hero.
+// No lettering: image/video models garble text, and the site stamps the real title on top.
+const CONCEPTS = {
+  // Ink bloom: a blue ink drop lands on paper and blooms; the paper bursts into a storm of pages.
+  ink: {
+    keyframe:
+      "High-speed macro photograph, pitch-black background. One small, perfectly round, glossy droplet of " +
+      "electric-blue (#1f6bff) ink hangs in mid-air, a few centimetres above the centre of a clean, bright off-white " +
+      "sheet of paper that is slightly crumpled with torn, fibrous edges. The paper keeps its natural warm white colour; " +
+      "blue appears only in the droplet, its tiny reflection, and a soft blue rim light on the paper edges. " +
+      "Out of focus in the dark background, a few loose white pages float. Clean composition, no debris, no stray " +
+      "marks, no hands, no pen. Crisp focus on the droplet, shallow depth of field, cinematic, subtle film grain. " +
+      "Absolutely no text, no letters, no words, no numbers.",
+    motion:
+      "The blue ink drop falls and hits the paper; electric-blue ink blooms outward in slow motion, swirling tendrils " +
+      "spreading across the sheet. The paper lifts and bursts into a whirlwind of dozens of white pages spiralling " +
+      "around the camera like a storm, lit by electric-blue light. The camera pushes forward through the swirling " +
+      "pages into deep dark blue. One continuous cinematic shot, smooth, dramatic, no text.",
+  },
+  // Paper storm: a vortex of research pages whirling in a black void around a blue light.
+  storm: {
+    keyframe:
+      "Cinematic wide shot in a pitch-black void: dozens of clean off-white paper pages with torn, fibrous edges " +
+      "swirl in a spiral vortex around the centre of the frame, like a paper tornado seen from inside. At the heart of " +
+      "the vortex glows a soft electric-blue (#1f6bff) light that rim-lights the edges of the pages. Pages in the " +
+      "foreground are large and motion-blurred, pages further in are sharp and small, creating strong depth. " +
+      "Dramatic, high contrast, subtle film grain, lots of black around the edges. " +
+      "Absolutely no text, no letters, no words, no numbers, no people.",
+    motion:
+      "The paper pages whirl faster and faster in a spiral vortex around the camera, fluttering and flipping, " +
+      "electric-blue light pulsing at the centre. The camera flies forward through the eye of the paper storm toward " +
+      "the blue light, pages rushing past the lens, ending in deep dark blue. One continuous cinematic shot, smooth, " +
+      "dramatic, no text.",
+  },
+} as const;
+type Concept = keyof typeof CONCEPTS;
 
 type Result = { images?: { url: string }[]; video?: { url: string }; jobs?: { results?: { raw?: { url: string } } }[] };
 
@@ -101,14 +124,15 @@ async function preflight() {
 
 /**
  * Credit-conscious steps — each costs exactly one Higgsfield generation:
- *   npm run intro:generate image            → 1 image  (saves public/intro/poster.*, prints its URL)
- *   npm run intro:generate video <imageUrl>  → 1 video  (animates that image → public/intro/intro-source.mp4)
+ *   npm run intro:generate image [ink|storm]             → 1 image (public/intro/keyframe-<concept>.*, prints URL)
+ *   npm run intro:generate video <imageUrl> [ink|storm]  → 1 video (animates it → public/intro/intro-source.mp4)
  * One 16:9 clip is enough: phones play the same clip cropped to fill the screen.
  */
 async function main() {
   const [step, arg] = process.argv.slice(2);
+  const conceptOf = (c?: string): Concept => (c && c in CONCEPTS ? (c as Concept) : "storm");
   if (step !== "image" && step !== "video") {
-    console.log("Usage:\n  npm run intro:generate image\n  npm run intro:generate video <imageUrl>");
+    console.log("Usage:\n  npm run intro:generate image [ink|storm]\n  npm run intro:generate video <imageUrl> [ink|storm]");
     process.exit(1);
   }
   if (step === "video" && !arg?.startsWith("https://")) {
@@ -120,16 +144,18 @@ async function main() {
 
   if (step === "image") {
     // Soul V2 (docs.higgsfield.ai): POST /higgsfield-ai/soul/v2/standard { prompt, ... } → images[0].url
-    const image = await run(IMAGE_ENDPOINT, { prompt: KEYFRAME_PROMPT, aspect_ratio: "16:9", seed: 2909 }, "image");
-    await download(image, `poster.${image.split("?")[0].split(".").pop() || "png"}`);
-    console.log(`\nCheck public/intro/poster.*, then animate it with:\n  npm run intro:generate video ${image}`);
+    const concept = conceptOf(arg);
+    const prompt = CONCEPTS[concept].keyframe;
+    const image = await run(IMAGE_ENDPOINT, { prompt, aspect_ratio: "16:9", seed: Number(process.env.HF_SEED) || 2909 }, "image");
+    await download(image, `keyframe-${concept}.${image.split("?")[0].split(".").pop() || "png"}`);
+    console.log(`\nCheck public/intro/keyframe-${concept}.*, then animate it with:\n  npm run intro:generate video ${image} ${concept}`);
     return;
   }
 
   const video = await run(
     VIDEO_ENDPOINT,
     // v1 endpoints take their inputs wrapped in `params`.
-    { params: { model: VIDEO_MODEL, prompt: MOTION_PROMPT, input_images: [{ type: "image_url", image_url: arg }], enhance_prompt: true, seed: 2909 } },
+    { params: { model: VIDEO_MODEL, prompt: CONCEPTS[conceptOf(process.argv[4])].motion, input_images: [{ type: "image_url", image_url: arg }], enhance_prompt: true, seed: 2909 } },
     "video",
   );
   await download(video, "intro-source.mp4");

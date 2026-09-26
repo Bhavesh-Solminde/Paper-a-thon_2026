@@ -120,12 +120,37 @@ export function Intro({ video }: { video?: { sources: { src: string; type: strin
       };
 
       if (vid) {
-        // Higgsfield clip mode: badge over the clip, the real title stamped on, then rip.
+        // Higgsfield clip mode: badge over the storm, the real title stamped on, then the camera flies into the
+        // vortex's dark eye and the site opens outward from it (a growing hole in a radial mask).
+        const eye = { r: -4 };
+        const setEye = () => {
+          const m = `radial-gradient(circle at 50% 52%, transparent ${eye.r}vmax, #000 ${eye.r + 4}vmax)`;
+          if (layer.current) {
+            layer.current.style.maskImage = m;
+            layer.current.style.webkitMaskImage = m;
+          }
+        };
+        const portal = gsap
+          .timeline({ paused: true, onComplete: finish })
+          .to(".intro-skip", { opacity: 0, duration: 0.2 }, 0)
+          .add(() => markIntroDone(), 0.1)
+          .to(".intro-v-title", { scale: 0.2, opacity: 0, duration: 0.55, ease: "power3.in" }, 0)
+          .to(vid, { scale: 1.7, duration: 1.3, ease: "power2.in" }, 0)
+          .to(eye, { r: 150, duration: 1.2, ease: "expo.in", onUpdate: setEye }, 0.1);
+        skip.current = () => {
+          clearTimers();
+          master?.kill();
+          portal.timeScale(1.6).play();
+        };
         let started = false;
         const fallback = () => {
           if (started) return;
           started = true;
           clearTimers();
+          skip.current = () => {
+            master?.kill();
+            rip.timeScale(1.8).play();
+          };
           vid.style.display = "none";
           gsap.set(".intro-v", { display: "none" });
           playPaper();
@@ -140,11 +165,11 @@ export function Intro({ video }: { video?: { sources: { src: string; type: strin
             .to(counter, { v: 100, duration: d, ease: "power1.inOut", onUpdate: tick }, 0)
             .fromTo(".intro-v-badge", { scale: 0.6, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.8, ease: "back.out(1.8)" }, 0.2)
             .to(".intro-v-badge", { y: -30, opacity: 0, duration: 0.5, ease: "power3.in" }, Math.min(1.9, d - 2.4))
-            .fromTo(".intro-v-title", { scale: 2.2, opacity: 0, rotate: -9 }, { scale: 1, opacity: 1, rotate: -3, duration: 0.3, ease: "power4.in" }, d - 1.9)
-            .to(".intro-shake", { x: 8, y: -5, duration: 0.05, repeat: 3, yoyo: true, ease: "none" }, d - 1.6)
-            .add(() => rip.play(), d - 0.6);
+            .fromTo(".intro-v-title", { scale: 2.2, opacity: 0, rotate: -9 }, { scale: 1, opacity: 1, rotate: -3, duration: 0.3, ease: "power4.in" }, d - 2.5)
+            .to(".intro-shake", { x: 8, y: -5, duration: 0.05, repeat: 3, yoyo: true, ease: "none" }, d - 2.2)
+            .add(() => portal.play(), d - 1.1);
           // Safety net if the clip stalls mid-way.
-          timers.push(setTimeout(() => rip.play(), (d + 4) * 1000));
+          timers.push(setTimeout(() => portal.play(), (d + 4) * 1000));
         };
         vid.addEventListener("playing", start, { once: true });
         vid.addEventListener("error", fallback, { once: true });

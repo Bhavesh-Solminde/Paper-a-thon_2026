@@ -39,6 +39,7 @@
 
 html {
   background: var(--color-ink);
+  overflow-x: clip; /* nothing (e.g. a card mid slide-in) may widen the page on phones */
 }
 html.intro-lock { overflow: hidden; }
 html.intro-seen .pat-intro { display: none; }
@@ -54,6 +55,7 @@ body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
+  overflow-x: clip; /* clip, unlike hidden, keeps position: sticky working */
 }
 
 ::selection {

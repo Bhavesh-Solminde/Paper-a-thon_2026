@@ -68,8 +68,7 @@ export function Hero({ loggedIn }: { loggedIn: boolean }) {
             .to(".hero-strip-0", { xPercent: -18, rotate: -6 }, 0)
             .to(".hero-strip-1", { xPercent: 20, rotate: 8 }, 0)
             .to(".hero-strip-2", { xPercent: -12, rotate: 5 }, 0)
-            .to(".hero-title", { scale: 0.85, opacity: 0.25, yPercent: 20 }, 0)
-            .to(".hero-glow", { scale: 1.6, opacity: 0 }, 0);
+            .to(".hero-title", { scale: 0.85, opacity: 0.25, yPercent: 20 }, 0);
           return off;
         },
       );

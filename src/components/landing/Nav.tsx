@@ -35,7 +35,7 @@ export function Nav({ loggedIn = false }: { loggedIn?: boolean }) {
     <>
       <header
         className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${
-          open ? "bg-ink" : scrolled ? "border-b border-line/70 bg-ink/75 backdrop-blur-xl" : "bg-transparent"
+          open ? "bg-ink" : scrolled ? "border-b border-line/70 bg-ink/[0.92]" : "bg-transparent"
         }`}
       >
         <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 md:h-20">

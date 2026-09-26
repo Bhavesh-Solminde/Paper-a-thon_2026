@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Caveat, Inter, Montserrat, Permanent_Marker } from "next/font/google";
 import { EVENT } from "@/lib/event";
-import { PlaneDirection } from "@/components/ui/PlaneDirection";
+import { PlaneCursor } from "@/components/ui/PlaneCursor";
 import "./globals.css";
 import "./plane-cursor.css";
 
@@ -40,7 +40,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="grain min-h-dvh">
         {children}
-        <PlaneDirection />
+        <PlaneCursor />
       </body>
     </html>
   );

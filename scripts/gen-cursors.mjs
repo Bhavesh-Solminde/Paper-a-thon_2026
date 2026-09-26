@@ -1,94 +1,22 @@
-// Generates the rotated paper-plane cursors: `node scripts/gen-cursors.mjs`
-//
-// The cursor stays a native OS cursor (zero lag). <PlaneDirection/> points it where the mouse is heading
-// by setting an inline `cursor` on the element under the pointer only (a whole-page style change costs
-// ~10ms per swap; one element costs ~0.2ms). Per heading (72, every 5°) × variant (plane, hover) we render
-// PNG @1x (32×32) and @2x (64×64): PNG is what every browser supports for cursors (Safari is unreliable
-// with SVG), and @2x keeps it sharp on Retina/HiDPI. Hotspot = the plane's nose, snapped to a whole pixel.
-// Outputs: public/cursors/*.png, src/lib/cursors.json (hotspots) and src/app/plane-cursor.css (defaults).
+// Renders the static paper-plane cursor images: `node scripts/gen-cursors.mjs`
+// These are only the no-JS fallback (and what shows for a moment before JS loads). With JS,
+// <PlaneCursor/> hides the OS cursor and draws the plane itself so it can rotate continuously.
+// PNG @1x (32×32) + @2x (64×64): PNG is what every browser supports for cursors; @2x keeps it sharp.
 import fs from "node:fs";
 import { Resvg } from "@resvg/resvg-js";
 
-const SIZE = 32;
-const STEP = 5;
-const NOSE = [1, 1];
-const HEADING = -133.2; // direction the source drawing points (nose (1,1) along the fold from (16,17))
-const SHAPES = {
-  plane: [
-    { pts: [[16, 17], [8, 28], [13, 22]], fill: "#94A3B8" },
-    { pts: [[1, 1], [16, 17], [28, 8]], fill: "#E2E8F0" },
-    { pts: [[1, 1], [8, 28], [16, 17]], fill: "#FFFFFF" },
-  ],
-  hover: [
-    { pts: [[16, 17], [8, 28], [13, 22]], fill: "#1F6BFF" },
-    { pts: [[1, 1], [16, 17], [28, 8]], fill: "#BFD6FF" },
-    { pts: [[1, 1], [8, 28], [16, 17]], fill: "#FFFFFF" },
-  ],
-};
+const plane = (belly, top, left) =>
+  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" fill="none">` +
+  `<polygon points="16,17 8,28 13,22" fill="${belly}" stroke="#0F172A" stroke-width="1.5" stroke-linejoin="round"/>` +
+  `<polygon points="1,1 16,17 28,8" fill="${top}" stroke="#0F172A" stroke-width="1.5" stroke-linejoin="round"/>` +
+  `<polygon points="1,1 8,28 16,17" fill="${left}" stroke="#0F172A" stroke-width="1.5" stroke-linejoin="round"/></svg>`;
 
-const rot = ([x, y], deg) => {
-  const r = (deg * Math.PI) / 180;
-  const dx = x - NOSE[0];
-  const dy = y - NOSE[1];
-  return [NOSE[0] + dx * Math.cos(r) - dy * Math.sin(r), NOSE[1] + dx * Math.sin(r) + dy * Math.cos(r)];
-};
-
-const OUT = "public/cursors";
-fs.rmSync(OUT, { recursive: true, force: true });
-fs.mkdirSync(OUT, { recursive: true });
-const INTERACTIVE = `a, button, [role="button"], label, select, summary, .cursor-pointer, input[type="checkbox"], input[type="radio"], input[type="submit"], input[type="button"], input[type="file"]`;
-const REST = Math.round((HEADING + 180) / STEP); // bucket closest to how the source drawing points
-
-const png = (svg, size) => new Resvg(svg, { fitTo: { mode: "width", value: size } }).render().asPng();
-const hotspots = [];
-let restCss = "";
-for (let i = 0; i < 360 / STEP; i++) {
-  const heading = -180 + i * STEP; // -180 … 165
-  const r = heading - HEADING;
-  const all = SHAPES.plane.flatMap((s) => s.pts.map((p) => rot(p, r)));
-  const xs = all.map((p) => p[0]);
-  const ys = all.map((p) => p[1]);
-  const pad = 1.2; // half the stroke plus a hair
-  const w = Math.max(...xs) - Math.min(...xs) + pad * 2;
-  const h = Math.max(...ys) - Math.min(...ys) + pad * 2;
-  const s = Math.min(1, (SIZE - 1) / Math.max(w, h));
-  // centre the rotated plane, then nudge so the nose lands exactly on a pixel (the hotspot)
-  let tx = SIZE / 2 - ((Math.min(...xs) + Math.max(...xs)) / 2) * s;
-  let ty = SIZE / 2 - ((Math.min(...ys) + Math.max(...ys)) / 2) * s;
-  const nx = NOSE[0] * s + tx;
-  const ny = NOSE[1] * s + ty;
-  tx += Math.round(nx) - nx;
-  ty += Math.round(ny) - ny;
-  const hx = Math.min(SIZE - 1, Math.max(0, Math.round(NOSE[0] * s + tx)));
-  const hy = Math.min(SIZE - 1, Math.max(0, Math.round(NOSE[1] * s + ty)));
-  const cursorValue = {};
-  for (const [variant, polys] of Object.entries(SHAPES)) {
-    const body = polys
-      .map((p) => `<polygon points="${p.pts.map((pt) => rot(pt, r).map((v) => v.toFixed(2)).join(",")).join(" ")}" fill="${p.fill}" stroke="#0F172A" stroke-width="1.5" stroke-linejoin="round"/>`)
-      .join("");
-    const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${SIZE} ${SIZE}" width="${SIZE}" height="${SIZE}" fill="none"><g transform="translate(${tx.toFixed(2)} ${ty.toFixed(2)}) scale(${s.toFixed(3)})">${body}</g></svg>`;
-    fs.writeFileSync(`${OUT}/${variant}-${i}.png`, png(svg, SIZE));
-    fs.writeFileSync(`${OUT}/${variant}-${i}@2x.png`, png(svg, SIZE * 2));
-    const fallback = variant === "plane" ? "auto" : "pointer";
-    const u1 = `url("/cursors/${variant}-${i}.png")`;
-    const u2 = `url("/cursors/${variant}-${i}@2x.png")`;
-    // Two declarations: browsers that don't take image-set() in cursor keep the first (plain PNG).
-    cursorValue[variant] = `cursor: ${u1} ${hx} ${hy}, ${fallback};\n    cursor: -webkit-image-set(${u1} 1x, ${u2} 2x) ${hx} ${hy}, ${fallback};`;
-  }
-  hotspots.push([hx, hy]);
-  if (i === REST) restCss = `  html {\n    ${cursorValue.plane}\n  }\n  :is(${INTERACTIVE}):not(:disabled) {\n    ${cursorValue.hover}\n  }`;
-}
-
-const css = `/* GENERATED by scripts/gen-cursors.mjs, do not edit. Default paper-plane cursor (native, zero lag).
-   <PlaneDirection/> turns it toward the direction of travel via an inline cursor on the hovered element.
-   Mouse/trackpad devices only; text fields keep the I-beam. */
-@media (hover: hover) and (pointer: fine) {
-${restCss}
-  :is(input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]):not([type="file"]), textarea, [contenteditable="true"]) {
-    cursor: text !important;
+const variants = { plane: plane("#94A3B8", "#E2E8F0", "#FFFFFF"), hover: plane("#1F6BFF", "#BFD6FF", "#FFFFFF") };
+fs.rmSync("public/cursors", { recursive: true, force: true });
+fs.mkdirSync("public/cursors", { recursive: true });
+for (const [name, svg] of Object.entries(variants)) {
+  for (const [suffix, size] of [["", 32], ["@2x", 64]]) {
+    fs.writeFileSync(`public/cursors/${name}${suffix}.png`, new Resvg(svg, { fitTo: { mode: "width", value: size } }).render().asPng());
   }
 }
-`;
-fs.writeFileSync("src/app/plane-cursor.css", css);
-fs.writeFileSync("src/lib/cursors.json", JSON.stringify({ step: STEP, rest: REST, hotspots }) + "\n");
-console.log(`wrote ${fs.readdirSync(OUT).length} cursor PNGs, src/lib/cursors.json and src/app/plane-cursor.css (rest bucket ${REST})`);
+console.log("wrote", fs.readdirSync("public/cursors").join(", "));

@@ -165,21 +165,6 @@ body {
   }
 }
 
-/* Paper-plane cursor: a real OS cursor (no JS), so it never lags behind the mouse.
-   The nose tip at (1,1) is the hotspot. Mouse/trackpad devices only; text fields keep the I-beam. */
-@media (hover: hover) and (pointer: fine) {
-  html {
-    cursor: url("/cursors/plane.svg") 1 1, url("/cursors/plane.png") 1 1, auto;
-  }
-  :is(a, button, [role="button"], label, select, summary, .cursor-pointer,
-      input[type="checkbox"], input[type="radio"], input[type="submit"], input[type="button"], input[type="file"]):not(:disabled) {
-    cursor: url("/cursors/plane-hover.svg") 1 1, url("/cursors/plane-hover.png") 1 1, pointer;
-  }
-  :is(input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]):not([type="file"]), textarea, [contenteditable="true"]) {
-    cursor: text;
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   .grain::after, .animate-marquee { animation: none !important; }
 }

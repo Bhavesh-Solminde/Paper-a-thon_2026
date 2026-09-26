@@ -165,22 +165,20 @@ body {
   }
 }
 
-/* Paper-plane cursor (added by <PaperPlaneCursor/> only for mouse/trackpad users) */
+/* Paper-plane cursor: a real OS cursor (no JS), so it never lags behind the mouse.
+   The nose tip at (1,1) is the hotspot. Mouse/trackpad devices only; text fields keep the I-beam. */
 @media (hover: hover) and (pointer: fine) {
-  html.plane-cursor,
-  html.plane-cursor * {
-    cursor: none !important;
+  html {
+    cursor: url("/cursors/plane.svg") 1 1, url("/cursors/plane.png") 1 1, auto;
   }
-  html.plane-cursor :is(input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]):not([type="file"]), textarea, [contenteditable="true"]) {
-    cursor: text !important;
+  :is(a, button, [role="button"], label, select, summary, .cursor-pointer,
+      input[type="checkbox"], input[type="radio"], input[type="submit"], input[type="button"], input[type="file"]):not(:disabled) {
+    cursor: url("/cursors/plane-hover.svg") 1 1, url("/cursors/plane-hover.png") 1 1, pointer;
+  }
+  :is(input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]):not([type="file"]), textarea, [contenteditable="true"]) {
+    cursor: text;
   }
 }
-.plane-cursor-el .plane-body { fill: var(--color-paper); stroke: var(--color-ink); transition: fill 0.2s; }
-.plane-cursor-el .plane-fold { fill: #c9c6bc; stroke: var(--color-ink); transition: fill 0.2s; }
-.plane-cursor-el .plane-crease { stroke: var(--color-blue); transition: stroke 0.2s; }
-.plane-cursor-el[data-hot="1"] .plane-body { fill: var(--color-blue); stroke: #fff; }
-.plane-cursor-el[data-hot="1"] .plane-fold { fill: var(--color-blue-deep); stroke: #fff; }
-.plane-cursor-el[data-hot="1"] .plane-crease { stroke: #fff; }
 
 @media (prefers-reduced-motion: reduce) {
   .grain::after, .animate-marquee { animation: none !important; }

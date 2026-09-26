@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Caveat, Inter, Montserrat, Permanent_Marker } from "next/font/google";
 import { EVENT } from "@/lib/event";
-import { PaperPlaneCursor } from "@/components/ui/PaperPlaneCursor";
 import "./globals.css";
 
 const montserrat = Montserrat({ variable: "--font-montserrat", subsets: ["latin"], weight: ["500", "700", "800", "900"] });
@@ -37,10 +36,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           }}
         />
       </head>
-      <body className="grain min-h-dvh">
-        {children}
-        <PaperPlaneCursor />
-      </body>
+      <body className="grain min-h-dvh">{children}</body>
     </html>
   );
 }

@@ -3,11 +3,13 @@ import { config } from "dotenv";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import { announcements, teams } from "../src/lib/db/schema";
+import { pgConnection } from "../src/lib/db/url";
 
 config({ path: ".env.local" });
 config();
 
-const client = postgres(process.env.DATABASE_URL!, { max: 1 });
+const conn = pgConnection(process.env.DATABASE_URL);
+const client = postgres(conn.url, { ...conn.options, max: 1 });
 const db = drizzle(client);
 
 const demo = [

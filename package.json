@@ -12,7 +12,8 @@
     "db:migrate": "drizzle-kit migrate",
     "db:seed": "tsx scripts/seed.ts",
     "typecheck": "tsc --noEmit",
-    "intro:generate": "tsx scripts/generate-intro.ts"
+    "intro:generate": "tsx scripts/generate-intro.ts",
+    "vercel-build": "drizzle-kit migrate && next build"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",

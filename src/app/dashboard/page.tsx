@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Nav } from "@/components/landing/Nav";
-import { PaperForm } from "@/components/team/PaperForm";
 import { QrPass } from "@/components/team/QrPass";
 import { ResultBanner } from "@/components/team/ResultBanner";
 import { StatusBadge, StatusTracker } from "@/components/team/StatusTracker";
@@ -22,7 +21,6 @@ export default async function Dashboard() {
 
   const status = visibleStatus(team, settings.resultsPublished);
   const slot = status === "shortlisted" ? slotFor(team.presentationOrder) : null;
-  const reviewed = team.status === "shortlisted" || team.status === "not_shortlisted";
 
   return (
     <>
@@ -73,7 +71,7 @@ export default async function Dashboard() {
           <section className="card mt-6 flex items-center gap-4 p-6">
             <span className="h-3 w-3 shrink-0 rounded-full bg-warn animate-pulse" />
             <p className="text-paper/80">
-              Your paper is with the review panel. Shortlisting results will appear here and on the{" "}
+              Your PPT is with the review panel. Shortlisted teams will be announced here and on the{" "}
               <Link href="/shortlisted" className="text-blue-bright underline underline-offset-4">public board</Link>.
             </p>
           </section>
@@ -81,12 +79,15 @@ export default async function Dashboard() {
 
         <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_22rem]">
           <div className="space-y-6">
-            <PaperForm
-              title={team.paperTitle}
-              url={team.paperUrl}
-              submittedAt={team.submittedAt?.toISOString() ?? null}
-              open={settings.submissionsOpen && !reviewed}
-            />
+            <div className="card p-6">
+              <div className="flex items-center justify-between gap-4">
+                <p className="font-display text-xs font-bold uppercase tracking-[0.25em] text-muted">PPT submission</p>
+                <span className="rounded-full bg-ok/15 px-3 py-1 font-display text-[0.65rem] font-extrabold uppercase tracking-[0.15em] text-ok">
+                  ✓ Received
+                </span>
+              </div>
+              <p className="mt-4 text-paper/80">Your presentation was submitted through the Google Form. Nothing else to upload.</p>
+            </div>
 
             <div className="card p-6">
               <div className="flex items-center justify-between">

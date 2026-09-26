@@ -2,7 +2,7 @@ import type { PublicStatus } from "@/lib/data";
 
 const STEPS = [
   { key: "registered", label: "Registered" },
-  { key: "paper_submitted", label: "Paper submitted" },
+  { key: "paper_submitted", label: "PPT submitted" },
   { key: "under_review", label: "Under review" },
   { key: "result", label: "Result" },
 ] as const;

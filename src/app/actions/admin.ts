@@ -117,6 +117,7 @@ export async function addTeam(_prev: FormResult, form: FormData): Promise<FormRe
     track: parsed.data.track,
     leaderEmail: parsed.data.leaderEmail,
     members: toMembers(parsed.data.members),
+    status: "paper_submitted", // PPT already submitted via the Google Form
   });
   refresh();
   return { message: `Added ${parsed.data.name} as ${id}.` };
@@ -155,7 +156,7 @@ export async function importTeams(_prev: FormResult, form: FormData): Promise<Fo
   if (valid.length) {
     const ids = await nextIds(valid.length);
     await db.insert(teams).values(
-      valid.map((t, i) => ({ id: ids[i], name: t.name, track: t.track, leaderEmail: t.leaderEmail, members: toMembers(t.members) })),
+      valid.map((t, i) => ({ id: ids[i], name: t.name, track: t.track, leaderEmail: t.leaderEmail, members: toMembers(t.members), status: "paper_submitted" as const })),
     );
   }
   refresh();

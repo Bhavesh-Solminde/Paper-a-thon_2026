@@ -25,11 +25,11 @@ export default async function AdminPage() {
   }
 
   const [teams, settings, announcements] = await Promise.all([listAllTeams(), getSettings(), listAnnouncements(20)]);
-  const count = (s: string) => teams.filter((t) => t.status === s).length;
+  const shortlisted = teams.filter((t) => t.status === "shortlisted").length;
   const stats = [
-    ["Registered", teams.length],
-    ["Papers in", teams.filter((t) => t.paperUrl).length],
-    ["Shortlisted", count("shortlisted")],
+    ["Teams", teams.length],
+    ["Shortlisted", shortlisted],
+    ["Not shortlisted", teams.length - shortlisted],
     ["Checked in", teams.filter((t) => t.checkedIn).length],
   ] as const;
 
@@ -54,18 +54,12 @@ export default async function AdminPage() {
         ))}
       </section>
 
-      <section className="mt-6 grid gap-3 md:grid-cols-2">
+      <section className="mt-6">
         <SettingToggle
           name="resultsPublished"
           label="Publish results"
-          hint="Reveals Shortlisted / Not shortlisted to teams and the public board."
+          hint="Shortlisted teams see their slot; every other team sees “Not shortlisted”. The public board goes live."
           value={settings.resultsPublished}
-        />
-        <SettingToggle
-          name="submissionsOpen"
-          label="Submissions open"
-          hint="Lets teams submit or update their paper link."
-          value={settings.submissionsOpen}
         />
       </section>
 
@@ -78,8 +72,6 @@ export default async function AdminPage() {
             leaderEmail: t.leaderEmail,
             members: t.members.map((m) => m.name),
             status: t.status,
-            paperTitle: t.paperTitle,
-            paperUrl: t.paperUrl,
             presentationOrder: t.presentationOrder,
             checkedIn: t.checkedIn,
             passUrl: passUrl(t.id),

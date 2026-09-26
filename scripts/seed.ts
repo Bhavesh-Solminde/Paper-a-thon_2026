@@ -33,14 +33,11 @@ async function main() {
       track,
       leaderEmail: `team${i + 1}@example.com`,
       members: members.map((m, j) => ({ name: m, leader: j === 0 })),
-      status: i < 5 ? ("paper_submitted" as const) : ("registered" as const),
-      paperTitle: i < 5 ? `A study by ${name}` : null,
-      paperUrl: i < 5 ? "https://example.com/paper.pdf" : null,
-      submittedAt: i < 5 ? new Date() : null,
+      status: "paper_submitted" as const, // PPTs came in via the Google Form
     })),
   );
   await db.insert(announcements).values([
-    { message: "Paper submissions are open — log in to your team dashboard to submit." },
+    { message: "PPT submissions are closed. Shortlisted teams will be announced here soon." },
   ]);
   console.log(`Seeded ${demo.length} teams (logins print the OTP to the dev server console).`);
   await client.end();

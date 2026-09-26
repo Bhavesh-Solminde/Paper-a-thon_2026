@@ -38,23 +38,23 @@ export const PHASES: Phase[] = [
   {
     key: "register",
     title: "Registration",
-    date: "Open now",
+    date: "Closed",
     at: "2026-09-20T00:00:00+05:30",
-    body: "Form your team, pick a track and register. Your team lead's email becomes your login.",
+    body: "Teams registered and picked their track. Your team lead's registered email is your login here.",
   },
   {
     key: "submit",
-    title: "Paper Submission",
-    date: "Before shortlisting",
+    title: "PPT Submission",
+    date: "Done · via Google Form",
     at: "2026-09-22T00:00:00+05:30",
-    body: "Log in to your team dashboard and drop the link to your research paper. Status flips to Paper Submitted instantly.",
+    body: "Teams submitted their presentations through the Google Form. Submissions are now closed.",
   },
   {
     key: "shortlist",
     title: "Shortlisting",
     date: "Results on the site",
-    at: "2026-09-28T09:00:00+05:30",
-    body: "Our panel reviews every paper. Shortlisted teams light up on the public board and get a presentation slot.",
+    at: "2026-09-26T00:00:00+05:30",
+    body: "Our panel reviews every PPT. Log in to see your result — shortlisted teams light up on the public board and get a presentation slot.",
   },
   {
     key: "seminar",
@@ -148,8 +148,12 @@ export const FAQ = [
     a: "Pick your team from the list. We email a 6-digit code to your team lead's registered email. Enter it and you're in — no passwords.",
   },
   {
-    q: "How do we submit our paper?",
-    a: "From your team dashboard, paste a shareable link to your paper (Google Drive, Overleaf, OneDrive…). Make sure anyone with the link can view it.",
+    q: "Where do we submit our PPT?",
+    a: "PPT submissions were collected through the Google Form and are now closed. Nothing needs to be uploaded on this site.",
+  },
+  {
+    q: "How do we know if we're shortlisted?",
+    a: "Log in to your team dashboard, or check the Shortlisted Teams board. Shortlisted teams also see their presentation slot for the 29th.",
   },
   {
     q: "How long is each presentation?",

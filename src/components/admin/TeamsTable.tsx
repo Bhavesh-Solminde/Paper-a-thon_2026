@@ -11,24 +11,21 @@ export type AdminTeam = {
   leaderEmail: string;
   members: string[];
   status: TeamStatus;
-  paperTitle: string | null;
-  paperUrl: string | null;
   presentationOrder: number | null;
   checkedIn: boolean;
   passUrl: string;
 };
 
-const LABEL: Record<TeamStatus, string> = {
-  registered: "Registered",
-  paper_submitted: "Submitted",
-  shortlisted: "Shortlisted",
-  not_shortlisted: "Not shortlisted",
-};
-
-const FILTERS = ["all", "registered", "paper_submitted", "shortlisted", "not_shortlisted"] as const;
+// PPTs came in through the Google Form, so a team is either shortlisted or not —
+// everyone not shortlisted is shown "Not shortlisted" once results are published.
+const FILTERS = [
+  { key: "all", label: "All", match: () => true },
+  { key: "shortlisted", label: "Shortlisted", match: (t: AdminTeam) => t.status === "shortlisted" },
+  { key: "others", label: "Not shortlisted", match: (t: AdminTeam) => t.status !== "shortlisted" },
+] as const;
 
 export function TeamsTable({ teams }: { teams: AdminTeam[] }) {
-  const [filter, setFilter] = useState<(typeof FILTERS)[number]>("all");
+  const [filter, setFilter] = useState<(typeof FILTERS)[number]["key"]>("all");
   const [q, setQ] = useState("");
   const [pending, start] = useTransition();
 
@@ -36,7 +33,7 @@ export function TeamsTable({ teams }: { teams: AdminTeam[] }) {
     () =>
       teams.filter(
         (t) =>
-          (filter === "all" || t.status === filter) &&
+          FILTERS.find((f) => f.key === filter)!.match(t) &&
           (!q.trim() || `${t.id} ${t.name} ${t.leaderEmail} ${t.members.join(" ")}`.toLowerCase().includes(q.trim().toLowerCase())),
       ),
     [teams, filter, q],
@@ -51,13 +48,13 @@ export function TeamsTable({ teams }: { teams: AdminTeam[] }) {
         <div className="flex gap-2 overflow-x-auto">
           {FILTERS.map((f) => (
             <button
-              key={f}
-              onClick={() => setFilter(f)}
+              key={f.key}
+              onClick={() => setFilter(f.key)}
               className={`shrink-0 rounded-full border px-3 py-1.5 text-xs font-bold uppercase tracking-wider ${
-                filter === f ? "border-blue bg-blue text-white" : "border-line text-paper/70"
+                filter === f.key ? "border-blue bg-blue text-white" : "border-line text-paper/70"
               }`}
             >
-              {f === "all" ? "All" : LABEL[f]} ({f === "all" ? teams.length : teams.filter((t) => t.status === f).length})
+              {f.label} ({teams.filter(f.match).length})
             </button>
           ))}
         </div>
@@ -65,7 +62,7 @@ export function TeamsTable({ teams }: { teams: AdminTeam[] }) {
 
       <div className={`divide-y divide-line ${pending ? "opacity-60" : ""}`}>
         {rows.map((t) => (
-          <div key={t.id} className="grid gap-4 p-4 lg:grid-cols-[1.4fr_1.2fr_auto] lg:items-center">
+          <div key={t.id} className="grid gap-4 p-4 lg:grid-cols-[1fr_auto] lg:items-center">
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2">
                 <span className="font-display text-xs font-bold tracking-widest text-blue-bright">{t.id}</span>
@@ -76,18 +73,6 @@ export function TeamsTable({ teams }: { teams: AdminTeam[] }) {
                 {t.track} · {t.leaderEmail}
               </p>
               <p className="mt-1 truncate text-xs text-paper/70">{t.members.join(", ")}</p>
-            </div>
-            <div className="min-w-0 text-sm">
-              {t.paperUrl ? (
-                <a href={t.paperUrl} target="_blank" rel="noreferrer" className="block truncate text-blue-bright underline underline-offset-4">
-                  {t.paperTitle || t.paperUrl}
-                </a>
-              ) : (
-                <span className="text-muted">No paper yet</span>
-              )}
-              <span className="mt-1 inline-block rounded-full border border-line px-2 py-0.5 text-[0.65rem] font-bold uppercase tracking-wider">
-                {LABEL[t.status]}
-              </span>
             </div>
             <div className="flex flex-wrap items-center gap-2">
               {t.status === "shortlisted" && (
@@ -108,15 +93,9 @@ export function TeamsTable({ teams }: { teams: AdminTeam[] }) {
               )}
               <button
                 className={`rounded-full px-3 py-1.5 text-xs font-bold uppercase ${t.status === "shortlisted" ? "bg-blue text-white" : "border border-line hover:border-blue"}`}
-                onClick={() => act(() => setTeamStatus(t.id, t.status === "shortlisted" ? (t.paperUrl ? "paper_submitted" : "registered") : "shortlisted"))}
+                onClick={() => act(() => setTeamStatus(t.id, t.status === "shortlisted" ? "paper_submitted" : "shortlisted"))}
               >
                 {t.status === "shortlisted" ? "★ Shortlisted" : "Shortlist"}
-              </button>
-              <button
-                className={`rounded-full px-3 py-1.5 text-xs font-bold uppercase ${t.status === "not_shortlisted" ? "bg-ink-3 text-muted" : "border border-line hover:border-red-400"}`}
-                onClick={() => act(() => setTeamStatus(t.id, t.status === "not_shortlisted" ? (t.paperUrl ? "paper_submitted" : "registered") : "not_shortlisted"))}
-              >
-                {t.status === "not_shortlisted" ? "Rejected" : "Reject"}
               </button>
               <button className="rounded-full border border-line px-3 py-1.5 text-xs font-bold uppercase hover:border-ok" onClick={() => act(() => toggleCheckIn(t.id, !t.checkedIn))}>
                 {t.checkedIn ? "Undo check-in" : "Check in"}

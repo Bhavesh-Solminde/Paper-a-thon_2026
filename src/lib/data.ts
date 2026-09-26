@@ -3,9 +3,9 @@ import { asc, desc, eq } from "drizzle-orm";
 import { announcements, db, settings, teams, type Team, type TeamStatus } from "./db";
 import { EVENT } from "./event";
 
-export type Settings = { resultsPublished: boolean; submissionsOpen: boolean };
+export type Settings = { resultsPublished: boolean };
 
-const DEFAULT_SETTINGS: Settings = { resultsPublished: false, submissionsOpen: true };
+const DEFAULT_SETTINGS: Settings = { resultsPublished: false };
 
 export async function getSettings(): Promise<Settings> {
   const rows = await db.select().from(settings);
@@ -26,15 +26,16 @@ export async function setSetting<K extends keyof Settings>(key: K, value: Settin
 /** What the outside world (and the team itself) should see, given whether results are out. */
 export type PublicStatus = TeamStatus | "under_review";
 
+// PPTs were submitted through the Google Form, so every team is under review until results are
+// published — then each team is either shortlisted or not.
 export function visibleStatus(team: Pick<Team, "status">, resultsPublished: boolean): PublicStatus {
-  if (resultsPublished) return team.status;
-  if (team.status === "shortlisted" || team.status === "not_shortlisted") return "under_review";
-  return team.status;
+  if (!resultsPublished) return "under_review";
+  return team.status === "shortlisted" ? "shortlisted" : "not_shortlisted";
 }
 
 export const STATUS_LABEL: Record<PublicStatus, string> = {
   registered: "Registered",
-  paper_submitted: "Paper Submitted",
+  paper_submitted: "PPT Submitted",
   under_review: "Under Review",
   shortlisted: "Shortlisted",
   not_shortlisted: "Not Shortlisted",

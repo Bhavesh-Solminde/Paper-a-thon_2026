@@ -6,26 +6,27 @@ Event site for **Paper-a-thon** by the Microsoft Learn Students Club. It covers 
 
 ## User flow
 
+PPT submissions were collected through a Google Form, so the site handles everything after that: results, event day and check-in.
+
 ```
 Landing (/)  ──►  Team Login (/login)  ──►  pick team  ──►  6-digit code emailed to team lead (Resend)
                                                         ──►  enter code  ──►  Team Dashboard (/dashboard)
-Dashboard: profile card (name · members · track · status) → progress tracker → submit paper link
+Dashboard: profile card (name · members · track · status) → progress tracker → PPT received
            → result (Shortlisted 🎉 + slot / "Better luck next time!") → download QR pass
 Public:    /shortlisted — every shortlisted team, members, track, presentation slot
-Organisers:/admin — import teams, shortlist/reject, publish results, announcements, check-in
+Organisers:/admin — import teams, mark shortlisted, publish results, announcements, check-in
 Desk:      scan QR → /pass/PAT-xxx?s=… (signed) → verify team → "Check in" (when logged in as admin)
 ```
 
-**Team status lifecycle**
+**What teams see**
 
-| Status | How it's set |
+| Before results are published | After **Publish results** in `/admin` |
 | --- | --- |
-| Registered | Team is added or imported by organisers |
-| Paper Submitted | Set automatically when the team submits a paper link from their dashboard |
-| Under Review | What teams see after the organisers mark them, until results are published |
-| Shortlisted / Not Shortlisted | Set in `/admin`, revealed to everyone when **Publish results** is switched on |
+| Under Review (PPT received via the Google Form) | **Shortlisted**, with their presentation slot, if marked in `/admin` |
+| | **Not Shortlisted** ("Better luck next time!") for every other team |
 
-Shortlisted teams get a presentation order automatically. Each slot is 7 min + 3 min, so it's 10 minutes: Session I runs 9:40–1:30 and Session II runs 2:00–5:00. Organisers can reorder with the `#` field in `/admin`.
+Organisers only mark the shortlisted teams; everyone else is automatically "not shortlisted" when results go live.
+Shortlisted teams get a presentation order automatically. Each slot is 7 min + 3 min, so it's 10 minutes: Session I runs 9:40–1:30 and Session II runs 2:00–5:00. You can reorder with the `#` field in `/admin`.
 
 ## Local setup
 

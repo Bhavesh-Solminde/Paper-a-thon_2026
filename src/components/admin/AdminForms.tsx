@@ -36,7 +36,7 @@ export function AdminLoginForm() {
   );
 }
 
-export function SettingToggle({ name, label, hint, value }: { name: "resultsPublished" | "submissionsOpen"; label: string; hint: string; value: boolean }) {
+export function SettingToggle({ name, label, hint, value }: { name: "resultsPublished"; label: string; hint: string; value: boolean }) {
   const [pending, start] = useTransition();
   return (
     <button

@@ -24,7 +24,7 @@ function introVideo() {
   return {
     desktop: has("intro-desktop.mp4") ? "/intro/intro-desktop.mp4" : undefined,
     mobile: has("intro-mobile.mp4") ? "/intro/intro-mobile.mp4" : undefined,
-    poster: has("poster.jpg") ? "/intro/poster.jpg" : undefined,
+    poster: ["poster.png", "poster.jpg", "poster.webp"].filter(has).map((f) => `/intro/${f}`)[0],
   };
 }
 

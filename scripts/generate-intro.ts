@@ -6,6 +6,7 @@
 //     then tears the screen open onto the site. Delete the files to go back to the paper intro.
 //
 // Needs HIGGSFIELD_API_KEY="KEY_ID:KEY_SECRET" in .env.local, and network access to api.higgsfield.ai.
+// Behind an HTTPS proxy, run with NODE_USE_ENV_PROXY=1 so Node's fetch uses it.
 // Endpoints/models can be overridden with HF_IMAGE_ENDPOINT, HF_VIDEO_ENDPOINT, HF_VIDEO_MODEL.
 import { config as loadEnv } from "dotenv";
 import fs from "node:fs/promises";
@@ -27,16 +28,19 @@ const IMAGE_ENDPOINT = process.env.HF_IMAGE_ENDPOINT || "higgsfield-ai/soul/v2/s
 const VIDEO_ENDPOINT = process.env.HF_VIDEO_ENDPOINT || "/v1/image2video/dop";
 const VIDEO_MODEL = process.env.HF_VIDEO_MODEL || "dop-turbo";
 
+// No lettering: image models garble text, and the site draws the real title on top anyway.
+// No lettering: image models garble text, and the site draws the real title on top anyway.
 const KEYFRAME_PROMPT =
-  "Cinematic macro shot on a pitch-black background: a stack of crumpled off-white research papers with torn, " +
-  "jagged edges, lying on a dark desk. The top sheet has the word 'PAPER-A-THON' in bold black brush-marker " +
-  "lettering. Electric-blue (#1f6bff) rim light and blue ink scribbles, handwritten notes 'Read Analyse Think Write' " +
-  "in blue pen. Moody, high contrast, film grain, shallow depth of field, poster-like composition, centered subject.";
+  "Cinematic macro photograph, pitch-black background. A loose stack of crumpled off-white paper sheets with " +
+  "torn, jagged, fibrous edges lies at the centre of a dark desk, one sheet partly ripped open. Electric-blue " +
+  "(#1f6bff) rim light grazes the torn edges; abstract blue ink brush strokes and splatters on the paper. " +
+  "Absolutely no text, no letters, no words, no numbers, no writing. Moody, high contrast, subtle film grain, " +
+  "shallow depth of field, lots of negative space around the subject, centered composition.";
 
 const MOTION_PROMPT =
-  "Slow dramatic push-in toward the paper stack. Pages flutter as if caught by a breeze, blue light sweeps across the " +
-  "torn edges, ink scribbles glow, then the top sheet begins to rip down the middle with paper fibres and small scraps " +
-  "flying toward the camera. Cinematic, smooth, 24fps, no text changes.";
+  "Slow cinematic push-in toward the paper stack. The sheets lift and flutter as if caught by a breeze, " +
+  "electric-blue light sweeps across the torn edges, then the top sheet rips apart down the middle and small " +
+  "paper scraps drift toward the camera. Smooth, dramatic, no text.";
 
 type Result = { images?: { url: string }[]; video?: { url: string }; jobs?: { results?: { raw?: { url: string } } }[] };
 
@@ -62,19 +66,8 @@ async function download(url: string, file: string) {
   console.log(`  saved public/intro/${file}`);
 }
 
-async function variant(name: "desktop" | "mobile", aspect: string, seed: number) {
-  // Soul V2 (docs.higgsfield.ai): POST /higgsfield-ai/soul/v2/standard { prompt, ... } → images[0].url
-  const image = await run(IMAGE_ENDPOINT, { prompt: KEYFRAME_PROMPT, aspect_ratio: aspect, seed }, "image");
-  if (name === "desktop") await download(image, "poster.jpg");
-  const video = await run(
-    VIDEO_ENDPOINT,
-    { model: VIDEO_MODEL, prompt: MOTION_PROMPT, input_images: [{ type: "image_url", image_url: image }], enhance_prompt: true, seed },
-    "video",
-  );
-  await download(video, `intro-${name}.mp4`);
-}
-
-// The SDK reports every HTTP 403 as "Not enough credits", which hides proxy/firewall blocks.
+// Free check before spending credits. The SDK reports every HTTP 403 as "Not enough credits",
+// which hides proxy/firewall blocks, so surface those here.
 async function preflight() {
   const r = await fetch("https://api.higgsfield.ai/v1/text2image/soul-styles", {
     headers: { Authorization: `Key ${credentials}`, Accept: "application/json" },
@@ -88,13 +81,41 @@ async function preflight() {
   if (r.status === 401) throw new Error("Higgsfield rejected the API key (401). Check HIGGSFIELD_API_KEY.");
 }
 
+/**
+ * Credit-conscious steps — each costs exactly one Higgsfield generation:
+ *   npm run intro:generate image            → 1 image  (saves public/intro/poster.*, prints its URL)
+ *   npm run intro:generate video <imageUrl>  → 1 video  (animates that image → public/intro/intro-desktop.mp4)
+ * One 16:9 clip is enough: phones play the same clip cropped to fill the screen.
+ */
 async function main() {
+  const [step, arg] = process.argv.slice(2);
+  if (step !== "image" && step !== "video") {
+    console.log("Usage:\n  npm run intro:generate image\n  npm run intro:generate video <imageUrl>");
+    process.exit(1);
+  }
+  if (step === "video" && !arg?.startsWith("https://")) {
+    console.error("Pass the image URL printed by the `image` step.");
+    process.exit(1);
+  }
   await preflight();
   await fs.mkdir(OUT, { recursive: true });
-  const only = process.argv[2]; // optional: "desktop" | "mobile"
-  if (!only || only === "desktop") await variant("desktop", process.env.HF_DESKTOP_ASPECT || "16:9", 2909);
-  if (!only || only === "mobile") await variant("mobile", process.env.HF_MOBILE_ASPECT || "9:16", 2910);
-  console.log("\nDone — reload the landing page (in a new tab/session) to see the Higgsfield intro.");
+
+  if (step === "image") {
+    // Soul V2 (docs.higgsfield.ai): POST /higgsfield-ai/soul/v2/standard { prompt, ... } → images[0].url
+    const image = await run(IMAGE_ENDPOINT, { prompt: KEYFRAME_PROMPT, aspect_ratio: "16:9", seed: 2909 }, "image");
+    await download(image, `poster.${image.split("?")[0].split(".").pop() || "png"}`);
+    console.log(`\nCheck public/intro/poster.*, then animate it with:\n  npm run intro:generate video ${image}`);
+    return;
+  }
+
+  const video = await run(
+    VIDEO_ENDPOINT,
+    // v1 endpoints take their inputs wrapped in `params`.
+    { params: { model: VIDEO_MODEL, prompt: MOTION_PROMPT, input_images: [{ type: "image_url", image_url: arg }], enhance_prompt: true, seed: 2909 } },
+    "video",
+  );
+  await download(video, "intro-desktop.mp4");
+  console.log("\nDone — open the landing page in a fresh tab to see the Higgsfield intro.");
 }
 
 main().catch((e) => {

@@ -45,7 +45,7 @@ function tearPath(w: number, h: number) {
  * a blue tear runs across the screen and the whole page rips open onto the site.
  * If a Higgsfield-generated clip exists (public/intro/*.mp4), it plays first and then tears away.
  */
-export function Intro({ video }: { video?: { desktop?: string; mobile?: string; poster?: string } }) {
+export function Intro({ video }: { video?: { sources: { src: string; type: string }[]; poster?: string } }) {
   const root = useRef<HTMLDivElement>(null);
   const layer = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -109,37 +109,78 @@ export function Intro({ video }: { video?: { desktop?: string; mobile?: string; 
 
       let master: gsap.core.Timeline | null = null;
       const vid = videoRef.current;
+      const timers: ReturnType<typeof setTimeout>[] = [];
+      const clearTimers = () => timers.forEach(clearTimeout);
+
+      skip.current = () => {
+        clearTimers();
+        master?.kill();
+        vid?.pause();
+        rip.timeScale(1.8).play();
+      };
 
       if (vid) {
-        // Higgsfield clip mode: play the clip, then rip.
-        const go = () => rip.play();
-        const timeout = setTimeout(go, 9000);
-        vid.addEventListener("ended", () => {
-          clearTimeout(timeout);
-          go();
-        }, { once: true });
-        // No playable source (missing file / unsupported) → rip straight away.
-        const probe = setTimeout(() => vid.readyState === 0 && (clearTimeout(timeout), go()), 2500);
-        vid.play().catch(() => {
-          clearTimeout(timeout);
-          clearTimeout(probe);
-          go();
-        });
-        gsap.to(counter, {
-          v: 100,
-          duration: 4,
-          ease: "power1.inOut",
-          onUpdate: () => counterEl && (counterEl.textContent = String(Math.round(counter.v)).padStart(3, "0")),
-        });
-        skip.current = () => {
-          clearTimeout(timeout);
-          vid.pause();
-          rip.timeScale(1.6).play();
+        // Higgsfield clip mode: badge over the clip, the real title stamped on, then rip.
+        let started = false;
+        const fallback = () => {
+          if (started) return;
+          started = true;
+          clearTimers();
+          vid.style.display = "none";
+          gsap.set(".intro-v", { display: "none" });
+          playPaper();
         };
-        return;
+        const start = () => {
+          if (started) return;
+          started = true;
+          clearTimers();
+          const d = Number.isFinite(vid.duration) && vid.duration > 2 ? vid.duration : 5;
+          master = gsap
+            .timeline({ defaults: { ease: "expo.out" } })
+            .to(counter, { v: 100, duration: d, ease: "power1.inOut", onUpdate: tick }, 0)
+            .fromTo(".intro-v-badge", { scale: 0.6, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.8, ease: "back.out(1.8)" }, 0.2)
+            .to(".intro-v-badge", { y: -30, opacity: 0, duration: 0.5, ease: "power3.in" }, Math.min(1.9, d - 2.4))
+            .fromTo(".intro-v-title", { scale: 2.2, opacity: 0, rotate: -9 }, { scale: 1, opacity: 1, rotate: -3, duration: 0.3, ease: "power4.in" }, d - 1.9)
+            .to(".intro-shake", { x: 8, y: -5, duration: 0.05, repeat: 3, yoyo: true, ease: "none" }, d - 1.6)
+            .add(() => rip.play(), d - 0.6);
+          // Safety net if the clip stalls mid-way.
+          timers.push(setTimeout(() => rip.play(), (d + 4) * 1000));
+        };
+        vid.addEventListener("playing", start, { once: true });
+        vid.addEventListener("error", fallback, { once: true });
+        vid.querySelectorAll("source").forEach((s) => s.addEventListener("error", () => vid.networkState === 3 && fallback()));
+        // Autoplay blocked (e.g. iOS Low Power Mode) or too slow to start → paper intro instead.
+        vid.play().catch(fallback);
+        // Too slow to start: keep waiting while data is still arriving, give up after ~6s.
+        const watchdog = (waited: number) => {
+          if (started) return;
+          // Already running (the "playing" event can fire before this effect subscribes).
+          if (!vid.paused && vid.currentTime > 0) return start();
+          if (waited >= 6000 || (waited >= 2500 && vid.networkState === 3)) return fallback();
+          timers.push(setTimeout(() => watchdog(waited + 500), 500));
+        };
+        watchdog(0);
+        return () => {
+          clearTimers();
+          vid.removeEventListener("playing", start);
+          vid.removeEventListener("error", fallback);
+          master?.kill();
+          rip.kill();
+        };
       }
 
-      // Paper mode.
+      playPaper();
+      return () => {
+        master?.kill();
+        rip.kill();
+      };
+
+      function tick() {
+        if (counterEl) counterEl.textContent = String(Math.round(counter.v)).padStart(3, "0");
+      }
+
+      function playPaper() {
+      gsap.set(".intro-paper", { display: "grid" });
       master = gsap.timeline({ defaults: { ease: "expo.out" } });
       master
         .to(counter, {
@@ -171,16 +212,7 @@ export function Intro({ video }: { video?: { desktop?: string; mobile?: string; 
         .to(".intro-shake", { x: 8, y: -5, duration: 0.05, repeat: 3, yoyo: true, ease: "none" }, 3.5)
         .fromTo(".intro-ink", { scale: 0, opacity: 0.9 }, { scale: 1, opacity: 0, duration: 0.6, ease: "power2.out" }, 3.48)
         .add(() => rip.play(), 3.95);
-
-      skip.current = () => {
-        master?.kill();
-        rip.timeScale(1.8).play();
-      };
-
-      return () => {
-        master?.kill();
-        rip.kill();
-      };
+      }
     },
     { scope: root },
   );
@@ -194,20 +226,38 @@ export function Intro({ video }: { video?: { desktop?: string; mobile?: string; 
           {/* blue light + grid, echoing the hero */}
           <div className="absolute left-1/2 top-1/2 h-[80vmax] w-[80vmax] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgb(31_107_255/0.22),transparent_60%)]" />
 
-          {video?.desktop || video?.mobile ? (
-            <video
-              ref={videoRef}
-              className="absolute inset-0 h-full w-full object-cover"
-              muted
-              playsInline
-              preload="auto"
-              poster={video.poster}
-            >
-              {video.mobile && <source src={video.mobile} type="video/mp4" media="(max-width: 767px)" />}
-              {video.desktop && <source src={video.desktop} type="video/mp4" />}
-            </video>
-          ) : (
-            <div className="absolute inset-0 grid place-items-center">
+          {video && (
+            <>
+              <video
+                ref={videoRef}
+                className="absolute inset-0 h-full w-full object-cover"
+                muted
+                playsInline
+                preload="auto"
+                poster={video.poster}
+              >
+                {video.sources.map((v) => (
+                  <source key={v.src} src={v.src} type={v.type} />
+                ))}
+              </video>
+              {/* Overlays on the Higgsfield clip: vignette, club badge, then the real title stamped on */}
+              <div className="intro-v pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_35%,rgb(6_7_10/0.75))]" />
+              <div className="intro-v intro-v-badge absolute inset-x-0 top-[14%] flex flex-col items-center opacity-0">
+                <Shield className="h-28 w-[6.4rem] drop-shadow-[0_10px_40px_rgb(0_120_212/0.6)] sm:h-36 sm:w-[8.2rem]" />
+                <p className="mt-4 font-display text-xs font-bold tracking-[0.8em] text-paper/80">PRESENTS</p>
+              </div>
+              <div className="intro-v absolute inset-0 grid place-items-center">
+                <TornPaper seed={52} depth={3} className="intro-v-title px-8 pt-5 pb-3 opacity-0 shadow-[0_30px_80px_-10px_rgb(0_0_0/0.9)] sm:px-12">
+                  <span className="brush flex flex-col items-center text-[clamp(3.6rem,19vw,8rem)] leading-[0.85] sm:flex-row sm:text-[clamp(3rem,11vw,8rem)] sm:leading-none">
+                    <span>PAPER</span>
+                    <span className="text-[0.5em] sm:text-[1em]">-A-</span>
+                    <span>THON</span>
+                  </span>
+                </TornPaper>
+              </div>
+            </>
+          )}
+          <div className={`intro-paper absolute inset-0 place-items-center ${video ? "hidden" : "grid"}`}>
               {/* badge */}
               <div className="absolute flex flex-col items-center">
                 <Shield className="intro-badge h-36 w-32 opacity-0 sm:h-44 sm:w-40" />
@@ -247,7 +297,6 @@ export function Intro({ video }: { video?: { desktop?: string; mobile?: string; 
                 </div>
               </div>
             </div>
-          )}
 
           {/* torn-paper scraps that fly on the rip */}
           <div className="intro-scraps pointer-events-none absolute left-1/2 top-1/2 opacity-0">

@@ -20,12 +20,12 @@ export const dynamic = "force-dynamic";
 function introVideo() {
   const dir = path.join(process.cwd(), "public", "intro");
   const has = (f: string) => fs.existsSync(path.join(dir, f));
-  if (!has("intro-desktop.mp4") && !has("intro-mobile.mp4")) return undefined;
-  return {
-    desktop: has("intro-desktop.mp4") ? "/intro/intro-desktop.mp4" : undefined,
-    mobile: has("intro-mobile.mp4") ? "/intro/intro-mobile.mp4" : undefined,
-    poster: ["poster.png", "poster.jpg", "poster.webp"].filter(has).map((f) => `/intro/${f}`)[0],
-  };
+  const sources = [
+    { src: "/intro/intro.webm", type: "video/webm" },
+    { src: "/intro/intro.mp4", type: "video/mp4" },
+  ].filter((s) => has(path.basename(s.src)));
+  if (!sources.length) return undefined;
+  return { sources, poster: ["poster.jpg", "poster.webp", "poster.png"].filter(has).map((f) => `/intro/${f}`)[0] };
 }
 
 export default async function Home() {

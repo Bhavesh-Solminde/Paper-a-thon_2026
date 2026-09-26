@@ -61,7 +61,7 @@ A Google Forms export works once you rename its columns to these names. Teams ge
 
 The landing page opens with an entry animation, shown once per browser session. You can skip it, and it's disabled when the visitor has turned on reduced motion in their system settings:
 - **Paper intro** (default): the MLSC badge, a stack of papers dropping in, "Read · Analyse · Think · Write · Repeat" flipping by, the title stamped on, then a glowing tear rips the screen open onto the site.
-- **Higgsfield intro**: run `npm run intro:generate` with `HIGGSFIELD_API_KEY` set. It paints a keyframe with Higgsfield Soul, animates it with DoP image-to-video, and saves `public/intro/intro-desktop.mp4`, `intro-mobile.mp4` and `poster.jpg`. When those files exist, the clip plays first and then tears away the same way. Delete them to go back to the paper intro. Generation needs credits on your Higgsfield account.
+- **Higgsfield intro** (live): `public/intro/intro.webm` + `intro.mp4` + `poster.jpg` is a clip generated with Higgsfield. A Soul V2 keyframe was animated with DoP image-to-video. The MLSC badge and the real title are layered on top, then the screen tears away. If the clip can't play (for example, autoplay is blocked in iPhone Low Power Mode), it falls back to the paper intro. To regenerate it (each step costs one generation): `NODE_USE_ENV_PROXY=1 npm run intro:generate image`, check `poster.*`, then `npm run intro:generate video <imageUrl>` and compress it with the printed ffmpeg commands.
 
 ## Editing content
 

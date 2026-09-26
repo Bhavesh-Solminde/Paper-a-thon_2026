@@ -22,7 +22,7 @@ export default async function PassPage({ params, searchParams }: { params: Promi
     <main className="mx-auto flex min-h-dvh max-w-md flex-col justify-center px-4 py-10">
       <div className="card overflow-hidden">
         <div className="flex items-center gap-3 border-b border-dashed border-line p-5">
-          <Shield className="h-10 w-9" />
+          <Shield className="h-11 w-10" />
           <div>
             <p className="font-display text-sm font-black uppercase">Paper-a-thon pass</p>
             <p className="text-xs font-semibold text-ok">✓ Verified — issued by the organisers</p>

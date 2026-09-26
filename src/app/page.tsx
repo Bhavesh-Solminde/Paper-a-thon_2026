@@ -1,4 +1,7 @@
+import fs from "node:fs";
+import path from "node:path";
 import { Nav } from "@/components/landing/Nav";
+import { Intro } from "@/components/landing/Intro";
 import { Hero } from "@/components/landing/Hero";
 import { Marquee } from "@/components/landing/Marquee";
 import { About } from "@/components/landing/About";
@@ -13,6 +16,18 @@ import { getTeamSession } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
+// Higgsfield-generated intro clips (see scripts/generate-intro.ts). Paper animation is used when absent.
+function introVideo() {
+  const dir = path.join(process.cwd(), "public", "intro");
+  const has = (f: string) => fs.existsSync(path.join(dir, f));
+  if (!has("intro-desktop.mp4") && !has("intro-mobile.mp4")) return undefined;
+  return {
+    desktop: has("intro-desktop.mp4") ? "/intro/intro-desktop.mp4" : undefined,
+    mobile: has("intro-mobile.mp4") ? "/intro/intro-mobile.mp4" : undefined,
+    poster: has("poster.jpg") ? "/intro/poster.jpg" : undefined,
+  };
+}
+
 export default async function Home() {
   const [settings, announcements, shortlisted, teamId] = await Promise.all([
     getSettings(),
@@ -23,6 +38,7 @@ export default async function Home() {
 
   return (
     <>
+      <Intro video={introVideo()} />
       <SmoothScroll />
       <Nav loggedIn={!!teamId} />
       <main>

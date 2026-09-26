@@ -30,7 +30,7 @@ export function TeamLogin({ teams }: { teams: TeamRow[] }) {
   return (
     <div className="mt-10">
       <div className="flex flex-col gap-3 md:flex-row md:items-center">
-        <label className="relative flex-1">
+        <label className="relative block md:w-80 md:shrink-0">
           <span className="sr-only">Search teams</span>
           <svg viewBox="0 0 24 24" className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
             <circle cx="11" cy="11" r="7" />
@@ -43,7 +43,7 @@ export function TeamLogin({ teams }: { teams: TeamRow[] }) {
             onChange={(e) => setQuery(e.target.value)}
           />
         </label>
-        <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 md:mx-0 md:px-0 md:pb-0">
+        <div className="-mx-4 flex min-w-0 gap-2 overflow-x-auto px-4 pb-1 md:mx-0 md:px-0 md:pb-0">
           {tracks.map((t) => (
             <button
               key={t}

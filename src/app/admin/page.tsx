@@ -16,7 +16,7 @@ export default async function AdminPage() {
     return (
       <main className="min-h-dvh px-4 pt-24">
         <div className="flex flex-col items-center text-center">
-          <Shield className="h-14 w-12" />
+          <Shield className="h-20 w-[4.6rem]" />
           <h1 className="mt-4 font-display text-3xl font-black uppercase">Organiser console</h1>
         </div>
         <AdminLoginForm />
@@ -37,7 +37,7 @@ export default async function AdminPage() {
     <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
       <header className="flex flex-wrap items-center justify-between gap-4">
         <Link href="/" className="flex items-center gap-3">
-          <Shield className="h-10 w-9" />
+          <Shield className="h-11 w-10" />
           <span className="font-display text-lg font-black uppercase">Organiser console</span>
         </Link>
         <form action={adminLogout}>

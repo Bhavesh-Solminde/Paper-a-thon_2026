@@ -24,9 +24,18 @@ export const viewport: Viewport = { themeColor: "#06070a" };
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html
+      suppressHydrationWarning
       lang="en"
       className={`${montserrat.variable} ${inter.variable} ${marker.variable} ${caveat.variable} antialiased`}
     >
+      <head>
+        {/* Decide before first paint whether the landing intro should play (once per session). */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try{if(location.pathname==="/"){document.documentElement.classList.add(sessionStorage.getItem("pat-intro-seen")?"intro-seen":"intro-lock")}}catch(e){}`,
+          }}
+        />
+      </head>
       <body className="grain min-h-dvh">{children}</body>
     </html>
   );

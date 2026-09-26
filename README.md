@@ -57,6 +57,12 @@ Neural Nomads,AI & Machine Learning,lead@gmail.com,Aarav Shah;Isha Patil;Rohan D
 
 A Google Forms export works once you rename its columns to these names. Teams get IDs `PAT-001`, `PAT-002`, … in order.
 
+## Entry animation (Higgsfield)
+
+The landing page opens with an entry animation, shown once per browser session. You can skip it, and it's disabled when the visitor has turned on reduced motion in their system settings:
+- **Paper intro** (default): the MLSC badge, a stack of papers dropping in, "Read · Analyse · Think · Write · Repeat" flipping by, the title stamped on, then a glowing tear rips the screen open onto the site.
+- **Higgsfield intro**: run `npm run intro:generate` with `HIGGSFIELD_API_KEY` set. It paints a keyframe with Higgsfield Soul, animates it with DoP image-to-video, and saves `public/intro/intro-desktop.mp4`, `intro-mobile.mp4` and `poster.jpg`. When those files exist, the clip plays first and then tears away the same way. Delete them to go back to the paper intro. Generation needs credits on your Higgsfield account.
+
 ## Editing content
 
 All event copy lives in **`src/lib/event.ts`**: dates, venue, tracks, the road-to-the-29th phases, the event-day schedule and the FAQ. The landing page, dashboard and emails all read from it.

@@ -9,7 +9,7 @@ export function Footer() {
         <div className="flex flex-col justify-between gap-10 md:flex-row">
           <div className="max-w-sm">
             <div className="flex items-center gap-3">
-              <Shield className="h-12 w-11" />
+              <Shield className="h-14 w-[3.2rem]" />
               <p className="font-display text-sm font-black uppercase leading-tight">
                 {EVENT.club}
                 <span className="block text-xs font-bold tracking-[0.3em] text-blue-bright">Connect · Learn · Grow</span>

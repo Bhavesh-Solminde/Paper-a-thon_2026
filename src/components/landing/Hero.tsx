@@ -9,6 +9,7 @@ import { TornPaper } from "@/components/ui/TornPaper";
 import { Shield } from "@/components/ui/Shield";
 import { Countdown } from "./Countdown";
 import { EVENT } from "@/lib/event";
+import { onIntroDone } from "@/lib/introBus";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
@@ -47,7 +48,8 @@ export function Hero({ loggedIn }: { loggedIn: boolean }) {
         (ctx) => {
           if (ctx.conditions?.reduce) return;
 
-          const tl = gsap.timeline({ defaults: { ease: "expo.out" } });
+          // Built paused (the from-states apply immediately) and played once the entry animation tears away.
+          const tl = gsap.timeline({ paused: true, defaults: { ease: "expo.out" } });
           tl.from(".hero-top > *", { y: 20, opacity: 0, stagger: 0.1, duration: 1 })
             .from(
               ".hero-strip",
@@ -58,6 +60,7 @@ export function Hero({ loggedIn }: { loggedIn: boolean }) {
             .from(".hero-slash path", { scale: 0, opacity: 0, transformOrigin: "center", stagger: 0.08, duration: 0.6 }, 1.0)
             .from(".hero-scribble", { opacity: 0, x: (i) => (i % 2 ? 30 : -30), duration: 1, stagger: 0.1 }, 1.0)
             .from(".hero-bottom > *", { y: 30, opacity: 0, stagger: 0.1, duration: 1 }, 1.1);
+          const off = onIntroDone(() => tl.play());
 
           // Scroll: the strips drift apart and the whole title recedes.
           gsap
@@ -67,6 +70,7 @@ export function Hero({ loggedIn }: { loggedIn: boolean }) {
             .to(".hero-strip-2", { xPercent: -12, rotate: 5 }, 0)
             .to(".hero-title", { scale: 0.85, opacity: 0.25, yPercent: 20 }, 0)
             .to(".hero-glow", { scale: 1.6, opacity: 0 }, 0);
+          return off;
         },
       );
     },
@@ -116,7 +120,7 @@ export function Hero({ loggedIn }: { loggedIn: boolean }) {
         <div className="hero-top flex flex-col items-center gap-3">
           <p className="font-display text-xs font-extrabold tracking-[0.18em] sm:text-base">{EVENT.club.toUpperCase()}</p>
           <p className="font-display text-[0.65rem] font-semibold tracking-[0.8em] text-paper/70 sm:text-xs">PRESENTS</p>
-          <Shield className="mt-1 h-16 w-14 sm:h-20 sm:w-[4.5rem]" />
+          <Shield className="mt-2 h-24 w-[5.5rem] drop-shadow-[0_10px_30px_rgb(0_120_212/0.45)] sm:h-28 sm:w-[6.4rem]" />
         </div>
 
         <h1 className="hero-title relative my-8 flex w-full max-w-4xl flex-col items-center sm:my-10" aria-label="Paper-a-thon">

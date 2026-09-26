@@ -25,7 +25,7 @@ export function ShortlistBoard({ teams }: { teams: BoardTeam[] }) {
     <>
       <div className="mt-10 flex flex-col gap-3 md:flex-row md:items-center">
         <input className="input h-12 md:max-w-sm" placeholder="Search team, ID or member…" value={q} onChange={(e) => setQ(e.target.value)} aria-label="Search shortlisted teams" />
-        <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 md:mx-0 md:px-0">
+        <div className="-mx-4 flex min-w-0 gap-2 overflow-x-auto px-4 pb-1 md:mx-0 md:px-0">
           {tracks.map((t) => (
             <button
               key={t}

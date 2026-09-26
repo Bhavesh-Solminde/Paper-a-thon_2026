@@ -1,6 +1,6 @@
 // Generates the landing-page entry clip with Higgsfield: `npm run intro:generate`
 //
-//  1. Soul (text-to-image) paints a keyframe in the poster's style
+//  1. Soul V2 (text-to-image) paints a keyframe in the poster's style
 //  2. DoP (image-to-video) animates it into a short cinematic clip
 //  3. Clips are saved to public/intro/ — the <Intro> component plays them automatically,
 //     then tears the screen open onto the site. Delete the files to go back to the paper intro.
@@ -23,7 +23,7 @@ if (!credentials) {
 
 const client = createHiggsfieldClient({ credentials, maxPollTime: 15 * 60_000, pollInterval: 4000 });
 const OUT = path.join(process.cwd(), "public", "intro");
-const IMAGE_ENDPOINT = process.env.HF_IMAGE_ENDPOINT || "/v1/text2image/soul";
+const IMAGE_ENDPOINT = process.env.HF_IMAGE_ENDPOINT || "higgsfield-ai/soul/v2/standard";
 const VIDEO_ENDPOINT = process.env.HF_VIDEO_ENDPOINT || "/v1/image2video/dop";
 const VIDEO_MODEL = process.env.HF_VIDEO_MODEL || "dop-turbo";
 
@@ -62,12 +62,9 @@ async function download(url: string, file: string) {
   console.log(`  saved public/intro/${file}`);
 }
 
-async function variant(name: "desktop" | "mobile", size: string, seed: number) {
-  const image = await run(
-    IMAGE_ENDPOINT,
-    { prompt: KEYFRAME_PROMPT, width_and_height: size, quality: "1080p", batch_size: 1, enhance_prompt: true, seed },
-    "image",
-  );
+async function variant(name: "desktop" | "mobile", aspect: string, seed: number) {
+  // Soul V2 (docs.higgsfield.ai): POST /higgsfield-ai/soul/v2/standard { prompt, ... } → images[0].url
+  const image = await run(IMAGE_ENDPOINT, { prompt: KEYFRAME_PROMPT, aspect_ratio: aspect, seed }, "image");
   if (name === "desktop") await download(image, "poster.jpg");
   const video = await run(
     VIDEO_ENDPOINT,
@@ -95,8 +92,8 @@ async function main() {
   await preflight();
   await fs.mkdir(OUT, { recursive: true });
   const only = process.argv[2]; // optional: "desktop" | "mobile"
-  if (!only || only === "desktop") await variant("desktop", process.env.HF_DESKTOP_SIZE || "2048x1152", 2909);
-  if (!only || only === "mobile") await variant("mobile", process.env.HF_MOBILE_SIZE || "1152x2048", 2910);
+  if (!only || only === "desktop") await variant("desktop", process.env.HF_DESKTOP_ASPECT || "16:9", 2909);
+  if (!only || only === "mobile") await variant("mobile", process.env.HF_MOBILE_ASPECT || "9:16", 2910);
   console.log("\nDone — reload the landing page (in a new tab/session) to see the Higgsfield intro.");
 }
 

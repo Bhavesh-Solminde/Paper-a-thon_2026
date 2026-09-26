@@ -1,5 +1,3 @@
-import fs from "node:fs";
-import path from "node:path";
 import { Nav } from "@/components/landing/Nav";
 import { Intro } from "@/components/landing/Intro";
 import { Hero } from "@/components/landing/Hero";
@@ -16,17 +14,16 @@ import { getTeamSession } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
-// Higgsfield-generated intro clips (see scripts/generate-intro.ts). Paper animation is used when absent.
-function introVideo() {
-  const dir = path.join(process.cwd(), "public", "intro");
-  const has = (f: string) => fs.existsSync(path.join(dir, f));
-  const sources = [
+// Higgsfield-generated intro clip (see scripts/generate-intro.ts). Files live in public/intro/ —
+// listed here rather than checked on disk, because serverless hosts (Vercel) don't ship public/ to functions.
+// Set to undefined to use the paper intro instead.
+const INTRO_VIDEO = {
+  sources: [
     { src: "/intro/intro.webm", type: "video/webm" },
     { src: "/intro/intro.mp4", type: "video/mp4" },
-  ].filter((s) => has(path.basename(s.src)));
-  if (!sources.length) return undefined;
-  return { sources, poster: ["poster.jpg", "poster.webp", "poster.png"].filter(has).map((f) => `/intro/${f}`)[0] };
-}
+  ],
+  poster: "/intro/poster.jpg",
+};
 
 export default async function Home() {
   const [settings, announcements, shortlisted, teamId] = await Promise.all([
@@ -38,7 +35,7 @@ export default async function Home() {
 
   return (
     <>
-      <Intro video={introVideo()} />
+      <Intro video={INTRO_VIDEO} />
       <SmoothScroll />
       <Nav loggedIn={!!teamId} />
       <main>

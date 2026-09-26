@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { AddTeamForm, AdminLoginForm, AnnouncementForm, ImportForm, SettingToggle } from "@/components/admin/AdminForms";
 import { TeamsTable } from "@/components/admin/TeamsTable";
+import { DeskCheckIn } from "@/components/admin/DeskCheckIn";
+import { attendance, toCheckInTeam } from "@/lib/checkin";
 import { Shield } from "@/components/ui/Shield";
 import { isAdmin } from "@/lib/auth";
 import { getSettings, listAllTeams, listAnnouncements } from "@/lib/data";
@@ -26,11 +28,14 @@ export default async function AdminPage() {
 
   const [teams, settings, announcements] = await Promise.all([listAllTeams(), getSettings(), listAnnouncements(20)]);
   const shortlisted = teams.filter((t) => t.status === "shortlisted").length;
+  const states = teams.map((t) => attendance(t.members).state);
+  const present = states.filter((s) => s === "present").length;
+  const pendingTeams = states.filter((s) => s === "pending").length;
   const stats = [
     ["Teams", teams.length],
     ["Shortlisted", shortlisted],
-    ["Not shortlisted", teams.length - shortlisted],
-    ["Checked in", teams.filter((t) => t.checkedIn).length],
+    ["Present", present],
+    ["Pending", pendingTeams],
   ] as const;
 
   return (
@@ -45,7 +50,11 @@ export default async function AdminPage() {
         </form>
       </header>
 
-      <section className="mt-8 grid grid-cols-2 gap-3 md:grid-cols-4">
+      <div className="mt-6">
+        <DeskCheckIn present={present} pending={pendingTeams} total={shortlisted || teams.length} />
+      </div>
+
+      <section className="mt-6 grid grid-cols-2 gap-3 md:grid-cols-4">
         {stats.map(([label, n]) => (
           <div key={label} className="card p-5">
             <p className="font-display text-4xl font-black">{n}</p>
@@ -66,14 +75,10 @@ export default async function AdminPage() {
       <section className="mt-6">
         <TeamsTable
           teams={teams.map((t) => ({
-            id: t.id,
-            name: t.name,
-            track: t.track,
+            ...toCheckInTeam(t),
             leaderEmail: t.leaderEmail,
-            members: t.members.map((m) => m.name),
             status: t.status,
             presentationOrder: t.presentationOrder,
-            checkedIn: t.checkedIn,
             passUrl: passUrl(t.id),
           }))}
         />

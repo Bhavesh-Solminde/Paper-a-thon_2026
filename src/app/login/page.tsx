@@ -20,7 +20,7 @@ export default async function LoginPage() {
           Find your <span className="brush text-blue-bright">team</span>
         </h1>
         <p className="mt-4 max-w-xl text-paper/70">
-          Pick your team below. We&apos;ll email a one-time code to your team lead&apos;s registered email — enter it to open
+          Pick your team below. We&apos;ll email a one-time code to your team lead&apos;s registered email. Enter it to open
           your dashboard.
         </p>
         <TeamLogin teams={teams} />

@@ -11,7 +11,7 @@ const caveat = Caveat({ variable: "--font-caveat", subsets: ["latin"], weight: [
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"),
   title: { default: "Paper-a-thon 2026 · MLSC", template: "%s · Paper-a-thon" },
-  description: `${EVENT.tagline.join(" ")} ${EVENT.subTagline}. ${EVENT.club} presents Paper-a-thon — ${EVENT.dateLabel}, ${EVENT.venue}.`,
+  description: `${EVENT.tagline.join(" ")} ${EVENT.subTagline}. ${EVENT.club} presents Paper-a-thon, ${EVENT.dateLabel}, ${EVENT.venue}.`,
   openGraph: {
     title: "Paper-a-thon 2026",
     description: "Fuel your curiosity. Shape the future. One paper at a time.",

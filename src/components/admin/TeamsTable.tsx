@@ -1,18 +1,16 @@
 "use client";
 
 import { useMemo, useState, useTransition } from "react";
-import { deleteTeam, setPresentationOrder, setTeamStatus, toggleCheckIn } from "@/app/actions/admin";
+import { deleteTeam, setPresentationOrder, setTeamStatus } from "@/app/actions/admin";
 import type { TeamStatus } from "@/lib/db/schema";
+import { attendance, type CheckInTeam } from "@/lib/checkin";
+import { AttendanceBadge, CheckInSheet } from "./CheckInSheet";
+import { Modal } from "./DeskCheckIn";
 
-export type AdminTeam = {
-  id: string;
-  name: string;
-  track: string;
+export type AdminTeam = CheckInTeam & {
   leaderEmail: string;
-  members: string[];
   status: TeamStatus;
   presentationOrder: number | null;
-  checkedIn: boolean;
   passUrl: string;
 };
 
@@ -22,19 +20,22 @@ const FILTERS = [
   { key: "all", label: "All", match: () => true },
   { key: "shortlisted", label: "Shortlisted", match: (t: AdminTeam) => t.status === "shortlisted" },
   { key: "others", label: "Not shortlisted", match: (t: AdminTeam) => t.status !== "shortlisted" },
+  { key: "present", label: "Present", match: (t: AdminTeam) => attendance(t.members).state === "present" },
+  { key: "pending", label: "Pending", match: (t: AdminTeam) => attendance(t.members).state === "pending" },
 ] as const;
 
 export function TeamsTable({ teams }: { teams: AdminTeam[] }) {
   const [filter, setFilter] = useState<(typeof FILTERS)[number]["key"]>("all");
   const [q, setQ] = useState("");
   const [pending, start] = useTransition();
+  const [checking, setChecking] = useState<AdminTeam | null>(null);
 
   const rows = useMemo(
     () =>
       teams.filter(
         (t) =>
           FILTERS.find((f) => f.key === filter)!.match(t) &&
-          (!q.trim() || `${t.id} ${t.name} ${t.leaderEmail} ${t.members.join(" ")}`.toLowerCase().includes(q.trim().toLowerCase())),
+          (!q.trim() || `${t.id} ${t.name} ${t.leaderEmail} ${t.members.map((m) => m.name).join(" ")}`.toLowerCase().includes(q.trim().toLowerCase())),
       ),
     [teams, filter, q],
   );
@@ -67,12 +68,12 @@ export function TeamsTable({ teams }: { teams: AdminTeam[] }) {
               <div className="flex flex-wrap items-center gap-2">
                 <span className="font-display text-xs font-bold tracking-widest text-blue-bright">{t.id}</span>
                 <span className="font-display font-black uppercase">{t.name}</span>
-                {t.checkedIn && <span className="rounded-full bg-ok/15 px-2 py-0.5 text-[0.6rem] font-bold uppercase text-ok">Checked in</span>}
+                {attendance(t.members).state !== "absent" && <AttendanceBadge members={t.members} />}
               </div>
               <p className="mt-1 truncate text-xs text-muted">
                 {t.track} · {t.leaderEmail}
               </p>
-              <p className="mt-1 truncate text-xs text-paper/70">{t.members.join(", ")}</p>
+              <p className="mt-1 truncate text-xs text-paper/70">{t.members.map((m) => m.name).join(", ")}</p>
             </div>
             <div className="flex flex-wrap items-center gap-2">
               {t.status === "shortlisted" && (
@@ -97,8 +98,8 @@ export function TeamsTable({ teams }: { teams: AdminTeam[] }) {
               >
                 {t.status === "shortlisted" ? "★ Shortlisted" : "Shortlist"}
               </button>
-              <button className="rounded-full border border-line px-3 py-1.5 text-xs font-bold uppercase hover:border-ok" onClick={() => act(() => toggleCheckIn(t.id, !t.checkedIn))}>
-                {t.checkedIn ? "Undo check-in" : "Check in"}
+              <button className="rounded-full border border-line px-3 py-1.5 text-xs font-bold uppercase hover:border-ok" onClick={() => setChecking(t)}>
+                {attendance(t.members).state === "absent" ? "Check in" : "Attendance"}
               </button>
               <a href={t.passUrl} target="_blank" rel="noreferrer" className="rounded-full border border-line px-3 py-1.5 text-xs font-bold uppercase hover:border-blue">
                 Pass
@@ -114,6 +115,14 @@ export function TeamsTable({ teams }: { teams: AdminTeam[] }) {
         ))}
         {rows.length === 0 && <p className="p-8 text-center text-sm text-muted">No teams.</p>}
       </div>
+
+      {checking && (
+        <Modal label={`Check in ${checking.name}`} onClose={() => setChecking(null)}>
+          <div className="pr-10">
+            <CheckInSheet team={checking} />
+          </div>
+        </Modal>
+      )}
     </div>
   );
 }

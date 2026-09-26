@@ -15,7 +15,7 @@ Dashboard: profile card (name · members · track · status) → progress tracke
            → result (Shortlisted 🎉 + slot / "Better luck next time!") → download QR pass
 Public:    /shortlisted — every shortlisted team, members, track, presentation slot
 Organisers:/admin — import teams, mark shortlisted, publish results, announcements, check-in
-Desk:      scan QR → /pass/PAT-xxx?s=… (signed) → verify team → "Check in" (when logged in as admin)
+Desk:      /admin → Scan QR (built-in camera scanner) → verified team → tick members present
 ```
 
 **What teams see**
@@ -27,6 +27,15 @@ Desk:      scan QR → /pass/PAT-xxx?s=… (signed) → verify team → "Check i
 
 Organisers only mark the shortlisted teams; everyone else is automatically "not shortlisted" when results go live.
 Shortlisted teams get a presentation order automatically. Each slot is 7 min + 3 min, so it's 10 minutes: Session I runs 9:40–1:30 and Session II runs 2:00–5:00. You can reorder with the `#` field in `/admin`.
+
+## Event-day check-in (desk)
+
+1. The desk volunteer logs in to `/admin` on a phone and keeps it open.
+2. Tap **Scan QR** and point the camera at the team's pass (or type the team ID, e.g. `PAT-007`). The pass signature is verified, so forged or edited QR codes are rejected.
+3. Tick the members who are present and save (or tap **Mark all present**). This doubles as attendance.
+4. The team shows **Pending x/y** until every member is checked in, then **Present**. When a latecomer arrives, scan the pass again (or tap **Attendance** on the team's row) and tick them. Members already checked in keep their original time.
+
+The QR only holds the team ID, name and a signed link, so it scans quickly. Opening the link with any phone camera shows the full verified pass.
 
 ## Local setup
 

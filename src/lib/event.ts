@@ -10,7 +10,7 @@ export const EVENT = {
   eventStart: "2026-09-29T09:00:00+05:30",
   eventEnd: "2026-09-29T17:30:00+05:30",
   dateLabel: "29 September",
-  timeLabel: "9 AM – 5:30 PM",
+  timeLabel: "9 AM to 5:30 PM",
   venue: "Seminar Hall, Ground Floor",
   hashtags: ["#PaperAthon", "#MLSCVCET"],
   slotMinutes: { presentation: 7, qna: 3 },
@@ -54,21 +54,21 @@ export const PHASES: Phase[] = [
     title: "Shortlisting",
     date: "Results on the site",
     at: "2026-09-26T00:00:00+05:30",
-    body: "Our panel reviews every PPT. Log in to see your result — shortlisted teams light up on the public board and get a presentation slot.",
+    body: "Our panel reviews every PPT. Log in to see your result.",
   },
   {
     key: "seminar",
     title: "Seminar",
     date: "28 Sep",
     at: "2026-09-28T10:00:00+05:30",
-    body: "A research-writing seminar by Sneha Ma'am — how to present, defend and publish your work.",
+    body: "A research-writing seminar by Sneha Ma'am on how to present, defend and publish your work.",
   },
   {
     key: "eventday",
     title: "Event Day",
     date: "29 Sep",
     at: "2026-09-29T09:00:00+05:30",
-    body: "Present your paper to the jury in the Seminar Hall. 7 minutes to pitch, 3 minutes to defend.",
+    body: "Present your paper to the jury in the Seminar Hall.",
   },
 ];
 
@@ -76,18 +76,17 @@ export type FlowItem = {
   start: string; // "09:00"
   end?: string;
   title: string;
-  detail: string;
+  detail?: string;
   kind: "ceremony" | "talk" | "presentations" | "break" | "wrap";
   forTeams?: string; // what shortlisted teams should be doing
 };
 
-// Event Day — 29th
+// Event Day: 29th
 export const FLOW: FlowItem[] = [
   {
     start: "09:00",
     end: "09:30",
     title: "Inauguration",
-    detail: "Lamp lighting, welcome address and a word from the faculty coordinators.",
     kind: "ceremony",
     forTeams: "Reach the Seminar Hall by 8:45, show your QR pass at the desk to check in.",
   },
@@ -102,7 +101,7 @@ export const FLOW: FlowItem[] = [
   {
     start: "09:40",
     end: "13:30",
-    title: "Presentations — Session I",
+    title: "Presentations: Session I",
     detail: "Teams present in slot order: 7 min presentation + 3 min Q&A each.",
     kind: "presentations",
     forTeams: "Your slot time is on your team dashboard. Be seated two slots early.",
@@ -111,22 +110,16 @@ export const FLOW: FlowItem[] = [
     start: "13:30",
     end: "14:00",
     title: "Break",
-    detail: "Lunch break. Jury deliberation on the morning session.",
+    detail: "Lunch break.",
     kind: "break",
   },
   {
     start: "14:00",
     end: "17:00",
-    title: "Presentations — Session II",
+    title: "Presentations: Session II",
     detail: "Remaining teams present. Same format: 7 + 3 minutes.",
     kind: "presentations",
     forTeams: "Afternoon slots continue from where Session I stopped.",
-  },
-  {
-    start: "17:00",
-    title: "Winding up",
-    detail: "Final remarks from the jury while scores are tallied.",
-    kind: "wrap",
   },
   {
     start: "17:00",
@@ -134,18 +127,18 @@ export const FLOW: FlowItem[] = [
     title: "Certificates & award ceremony",
     detail: "Winners announced, prizes handed out, certificates for every presenting team.",
     kind: "ceremony",
-    forTeams: "Stay till the end — certificates are handed out in person.",
+    forTeams: "Stay till the end. Certificates are handed out in person.",
   },
 ];
 
 export const FAQ = [
   {
     q: "Who can participate?",
-    a: "Everyone. Paper-a-thon is open to all students — any year, any branch.",
+    a: "Students from second year onwards, from any branch. First-year students are not eligible this time.",
   },
   {
     q: "How do we log in?",
-    a: "Pick your team from the list. We email a 6-digit code to your team lead's registered email. Enter it and you're in — no passwords.",
+    a: "Pick your team from the list. We email a 6-digit code to your team lead's registered email. Enter it and you're in. No passwords.",
   },
   {
     q: "Where do we submit our PPT?",
@@ -157,7 +150,7 @@ export const FAQ = [
   },
   {
     q: "How long is each presentation?",
-    a: "7 minutes of presentation followed by 3 minutes of questions from the jury — 10 minutes per team.",
+    a: "7 minutes of presentation followed by 3 minutes of questions from the jury, so 10 minutes per team.",
   },
   {
     q: "What is the QR pass for?",
@@ -165,7 +158,7 @@ export const FAQ = [
   },
   {
     q: "Can our paper get published?",
-    a: "Yes — standout papers get guidance and an opportunity to be published.",
+    a: "Yes. Standout papers get guidance and an opportunity to be published, and promising projects may get funding.",
   },
 ];
 

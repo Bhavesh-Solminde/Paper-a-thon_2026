@@ -86,7 +86,7 @@ export function EventFlow({ announcements }: { announcements: Announcement[] }) 
             <span className="brush mt-1 block text-6xl text-blue-bright sm:text-8xl">29th</span>
           </h2>
           <p className="mt-4 text-paper/70">
-            {EVENT.venue}. Everything that happens on the day, in order — timings are IST.
+            {EVENT.venue}. Everything that happens on the day, in order. Timings are IST.
           </p>
 
           <div className="card mt-8 p-6">
@@ -119,7 +119,7 @@ export function EventFlow({ announcements }: { announcements: Announcement[] }) 
               <span className="h-2 w-2 rounded-full bg-blue animate-pulse-dot" aria-hidden />
             </div>
             {announcements.length === 0 ? (
-              <p className="mt-4 text-sm text-muted">Nothing yet — updates from the organisers will appear here.</p>
+              <p className="mt-4 text-sm text-muted">Nothing yet. Updates from the organisers will appear here.</p>
             ) : (
               <ul className="mt-4 space-y-4">
                 {announcements.map((a) => (
@@ -174,7 +174,7 @@ export function EventFlow({ announcements }: { announcements: Announcement[] }) 
                     </span>
                     {end && (
                       <span className="font-display text-xs font-bold tracking-wide text-muted">
-                        {start.t} {start.ap} – {end.t} {end.ap}
+                        {start.t} {start.ap} to {end.t} {end.ap}
                       </span>
                     )}
                     {s === "live" && (
@@ -182,7 +182,7 @@ export function EventFlow({ announcements }: { announcements: Announcement[] }) 
                     )}
                   </div>
                   <h3 className="mt-3 font-display text-xl font-black uppercase leading-tight sm:text-2xl">{item.title}</h3>
-                  <p className="mt-2 text-paper/70">{item.detail}</p>
+                  {item.detail && <p className="mt-2 text-paper/70">{item.detail}</p>}
                   {item.forTeams && (
                     <p className="mt-4 flex flex-col gap-1 rounded-xl bg-ink-3 p-3 text-sm text-paper/85 sm:flex-row sm:gap-2">
                       <span className="hand shrink-0 text-xl leading-5">teams →</span>

@@ -12,7 +12,7 @@ export function ShortlistCta({ published, count }: { published: boolean; count: 
         <p className="mx-auto mt-4 max-w-xl text-ink/70">
           {published
             ? "See every shortlisted team, their track, members and presentation slot for the 29th."
-            : "Once the panel finishes reviewing, shortlisted teams will be announced right here — keep your dashboard handy."}
+            : "Once the panel finishes reviewing, shortlisted teams will be announced right here. Keep your dashboard handy."}
         </p>
         <div className="mt-8 flex flex-wrap justify-center gap-3">
           <Link href="/shortlisted" className="btn bg-ink text-paper hover:bg-blue">

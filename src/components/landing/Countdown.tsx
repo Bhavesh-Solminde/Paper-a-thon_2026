@@ -19,7 +19,7 @@ export function Countdown({ to, end }: { to: string; end: string }) {
   const finish = new Date(end).getTime();
 
   if (now !== null && now >= finish) {
-    return <p className="font-display text-sm font-bold uppercase tracking-[0.2em] text-muted">That&apos;s a wrap — thank you for coming!</p>;
+    return <p className="font-display text-sm font-bold uppercase tracking-[0.2em] text-muted">That&apos;s a wrap. Thank you for coming!</p>;
   }
   if (now !== null && now >= target) {
     return (
@@ -41,7 +41,7 @@ export function Countdown({ to, end }: { to: string; end: string }) {
       {cells.map(([label, v]) => (
         <div key={label} className="card min-w-16 px-3 py-2 text-center sm:min-w-20 sm:px-4 sm:py-3">
           <div className="font-display text-2xl font-black tabular-nums sm:text-3xl" suppressHydrationWarning>
-            {now === null ? "––" : String(v).padStart(2, "0")}
+            {now === null ? "00" : String(v).padStart(2, "0")}
           </div>
           <div className="text-[0.6rem] font-bold uppercase tracking-[0.25em] text-muted">{label}</div>
         </div>

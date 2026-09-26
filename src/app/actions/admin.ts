@@ -5,8 +5,9 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { announcements, db, teams, type Member, type TeamStatus } from "@/lib/db";
-import { setSetting, type Settings } from "@/lib/data";
-import { clearAdminSession, isAdmin, safeEqual, setAdminSession } from "@/lib/auth";
+import { getTeam, setSetting, type Settings } from "@/lib/data";
+import { parsePassQr, toCheckInTeam, type CheckInTeam } from "@/lib/checkin";
+import { clearAdminSession, isAdmin, passSignature, safeEqual, setAdminSession } from "@/lib/auth";
 import { parseCsv } from "@/lib/csv";
 
 async function guard() {
@@ -54,13 +55,47 @@ export async function setPresentationOrder(teamId: string, order: number | null)
   refresh();
 }
 
-export async function toggleCheckIn(teamId: string, checkedIn: boolean) {
+export type CheckInResult = { ok: true; team: CheckInTeam } | { ok: false; error: string };
+
+/** Desk scanner: verify a scanned pass QR and load the team's member checklist. */
+export async function lookupPass(scanned: string): Promise<CheckInResult> {
   await guard();
+  const pass = parsePassQr(scanned);
+  if (!pass) return { ok: false, error: "This QR code isn't a Paper-a-thon team pass." };
+  if (!safeEqual(pass.sig, passSignature(pass.id))) return { ok: false, error: "This pass failed verification. It may be forged or edited." };
+  const team = await getTeam(pass.id);
+  if (!team) return { ok: false, error: `Team ${pass.id} no longer exists.` };
+  return { ok: true, team: toCheckInTeam(team) };
+}
+
+/** Manual fallback when a pass can't be scanned: look a team up by its ID. */
+export async function lookupTeamById(rawId: string): Promise<CheckInResult> {
+  await guard();
+  const digits = rawId.trim().toUpperCase().replace(/^PAT-?/, "").replace(/\D/g, "");
+  if (!digits) return { ok: false, error: "Enter a team ID like PAT-007." };
+  const id = `PAT-${digits.padStart(3, "0")}`;
+  const team = await getTeam(id);
+  if (!team) return { ok: false, error: `No team with ID ${id}.` };
+  return { ok: true, team: toCheckInTeam(team) };
+}
+
+/**
+ * Save which members are present. Members already checked in keep their original time;
+ * the team counts as checked in only once every member is present.
+ */
+export async function saveCheckIn(teamId: string, present: boolean[]): Promise<CheckInResult> {
+  await guard();
+  const team = await getTeam(teamId);
+  if (!team) return { ok: false, error: "Team not found." };
+  const now = new Date().toISOString();
+  const members = team.members.map((m, i) => ({ ...m, checkedInAt: present[i] ? (m.checkedInAt ?? now) : null }));
+  const all = members.length > 0 && members.every((m) => m.checkedInAt);
   await db
     .update(teams)
-    .set({ checkedIn, checkedInAt: checkedIn ? new Date() : null })
+    .set({ members, checkedIn: all, checkedInAt: all ? (team.checkedInAt ?? new Date()) : null })
     .where(eq(teams.id, teamId));
   refresh();
+  return { ok: true, team: toCheckInTeam({ ...team, members }) };
 }
 
 export async function updateSetting(key: keyof Settings, value: boolean) {

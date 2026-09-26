@@ -4,7 +4,7 @@ import { TornPaper } from "@/components/ui/TornPaper";
 const PERKS = [
   {
     title: "Exciting prizes for winners",
-    body: "Cash prizes, goodies and certificates for the top papers — and bragging rights for the year.",
+    body: "Cash prizes, goodies and certificates for the top papers, plus bragging rights for the year.",
     icon: (
       <path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4ZM7 6H4a3 3 0 0 0 3 4M17 6h3a3 3 0 0 1-3 4" />
     ),
@@ -21,14 +21,13 @@ const PERKS = [
     ),
   },
   {
-    title: "Open to everyone",
-    body: "Any year, any branch. If you're curious and can put an idea on paper, there's a seat for you.",
+    title: "Possibility of project funding",
+    body: "Promising ideas can get funding support to grow beyond the paper into a real project.",
     icon: (
       <>
-        <circle cx="12" cy="7" r="3" />
-        <circle cx="5" cy="9" r="2" />
-        <circle cx="19" cy="9" r="2" />
-        <path d="M6 20v-2a6 6 0 0 1 12 0v2M2 20v-1a3 3 0 0 1 3-3M22 20v-1a3 3 0 0 0-3-3" />
+        <path d="M12 2v2M12 20v2" />
+        <path d="M16 7.5C16 5.6 14.2 5 12 5s-4 .9-4 2.8c0 4.2 8 2.3 8 6.6 0 1.9-1.8 2.6-4 2.6s-4-.8-4-2.7" />
+        <circle cx="12" cy="12" r="10" />
       </>
     ),
   },
@@ -47,7 +46,7 @@ export function About() {
             </h2>
           </div>
           <p className="text-lg leading-relaxed text-paper/70" data-reveal>
-            Teams pick a track, write a research paper, and — if shortlisted — defend it live in front of a jury
+            Teams pick a track and write a research paper. Shortlisted teams defend it live in front of a jury
             at the Seminar Hall. It&apos;s where ideas get sharpened into arguments, and arguments into publications.
           </p>
         </div>

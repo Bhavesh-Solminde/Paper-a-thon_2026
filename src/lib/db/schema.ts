@@ -18,7 +18,8 @@ export const teamStatus = pgEnum("team_status", [
 
 export type TeamStatus = (typeof teamStatus.enumValues)[number];
 
-export type Member = { name: string; email?: string; leader?: boolean };
+// checkedInAt: ISO time the member was checked in at the event desk (null/absent = not yet).
+export type Member = { name: string; email?: string; leader?: boolean; checkedInAt?: string | null };
 
 export const teams = pgTable("teams", {
   id: text("id").primaryKey(), // e.g. PAT-007

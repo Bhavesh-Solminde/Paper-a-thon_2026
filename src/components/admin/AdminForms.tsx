@@ -95,7 +95,7 @@ export function AddTeamForm() {
         ))}
       </select>
       <input name="leaderEmail" type="email" required className="input" placeholder="Team lead email (receives login codes)" />
-      <textarea name="members" required rows={3} className="input" placeholder={"Members, one per line — team lead first"} />
+      <textarea name="members" required rows={3} className="input" placeholder={"Members, one per line, team lead first"} />
       <button className="btn btn-primary w-full" disabled={pending}>{pending ? "Adding…" : "Add team"}</button>
       <Result state={state} />
     </form>
@@ -108,7 +108,7 @@ export function ImportForm() {
     <form action={action} className="card space-y-3 p-6">
       <p className="font-display text-xs font-bold uppercase tracking-[0.25em] text-muted">Bulk import (CSV)</p>
       <p className="text-xs text-muted">
-        Header row: <code className="text-paper">team_name,track,leader_email,members</code> — members separated by{" "}
+        Header row: <code className="text-paper">team_name,track,leader_email,members</code>. Members are separated by{" "}
         <code className="text-paper">;</code>, lead first. Works with a Google Forms export after renaming columns.
       </p>
       <input name="file" type="file" accept=".csv,text/csv" required className="input file:mr-3 file:rounded-full file:border-0 file:bg-blue file:px-3 file:py-1 file:text-white" />

@@ -77,7 +77,22 @@ async function variant(name: "desktop" | "mobile", size: string, seed: number) {
   await download(video, `intro-${name}.mp4`);
 }
 
+// The SDK reports every HTTP 403 as "Not enough credits", which hides proxy/firewall blocks.
+async function preflight() {
+  const r = await fetch("https://api.higgsfield.ai/v1/text2image/soul-styles", {
+    headers: { Authorization: `Key ${credentials}`, Accept: "application/json" },
+  }).catch((e) => {
+    throw new Error(`Cannot reach api.higgsfield.ai (${e.cause?.code || e.message})`);
+  });
+  if (r.status === 403) {
+    const body = await r.text();
+    if (/allowlist|egress|proxy/i.test(body)) throw new Error(`Network blocks api.higgsfield.ai: ${body.trim()}`);
+  }
+  if (r.status === 401) throw new Error("Higgsfield rejected the API key (401). Check HIGGSFIELD_API_KEY.");
+}
+
 async function main() {
+  await preflight();
   await fs.mkdir(OUT, { recursive: true });
   const only = process.argv[2]; // optional: "desktop" | "mobile"
   if (!only || only === "desktop") await variant("desktop", process.env.HF_DESKTOP_SIZE || "2048x1152", 2909);

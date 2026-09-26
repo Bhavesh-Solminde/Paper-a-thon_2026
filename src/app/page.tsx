@@ -14,14 +14,12 @@ import { getTeamSession } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
-// Higgsfield-generated intro clip (see scripts/generate-intro.ts). Files live in public/intro/ —
-// listed here rather than checked on disk, because serverless hosts (Vercel) don't ship public/ to functions.
+// Higgsfield-generated intro clip (see scripts/generate-intro.ts): the original master, untouched
+// (only remuxed for fast start). Desktop only; phones skip the intro entirely. Files live in public/intro/
+// and are listed here rather than checked on disk, because Vercel doesn't ship public/ to functions.
 // Set to undefined to use the paper intro instead.
 const INTRO_VIDEO = {
-  sources: [
-    { src: "/intro/intro.webm", type: "video/webm" },
-    { src: "/intro/intro.mp4", type: "video/mp4" },
-  ],
+  sources: [{ src: "/intro/intro-hd.mp4", type: "video/mp4" }],
   poster: "/intro/poster.jpg",
 };
 

@@ -29,10 +29,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       className={`${montserrat.variable} ${inter.variable} ${marker.variable} ${caveat.variable} antialiased`}
     >
       <head>
-        {/* Decide before first paint whether the landing intro should play (once per session). */}
+        {/* Decide before first paint whether the landing intro plays: once per session, desktop/tablet only. */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `try{if(location.pathname==="/"){document.documentElement.classList.add(sessionStorage.getItem("pat-intro-seen")?"intro-seen":"intro-lock")}}catch(e){}`,
+            __html: `try{if(location.pathname==="/"){var s=sessionStorage.getItem("pat-intro-seen")||matchMedia("(max-width: 767px)").matches;document.documentElement.classList.add(s?"intro-seen":"intro-lock")}}catch(e){}`,
           }}
         />
       </head>

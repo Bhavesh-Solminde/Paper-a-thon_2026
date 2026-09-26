@@ -70,7 +70,9 @@ export function Intro({ video }: { video?: { sources: { src: string; type: strin
         setGone(true);
       };
 
-      if (seen || reduce) {
+      // Phones skip the entrance entirely (and never download the video).
+      const mobile = window.matchMedia("(max-width: 767px)").matches;
+      if (seen || reduce || mobile) {
         markIntroDone();
         finish();
         return;
@@ -175,13 +177,16 @@ export function Intro({ video }: { video?: { sources: { src: string; type: strin
         vid.addEventListener("error", fallback, { once: true });
         vid.querySelectorAll("source").forEach((s) => s.addEventListener("error", () => vid.networkState === 3 && fallback()));
         // Autoplay blocked (e.g. iOS Low Power Mode) or too slow to start → paper intro instead.
+        // Only desktop gets here, so only desktop ever fetches the (heavy, full-quality) clip.
+        if (video?.poster) vid.poster = video.poster;
+        vid.preload = "auto";
         vid.play().catch(fallback);
-        // Too slow to start: keep waiting while data is still arriving, give up after ~6s.
+        // Too slow to start: keep waiting while data is still arriving, give up after ~9s.
         const watchdog = (waited: number) => {
           if (started) return;
           // Already running (the "playing" event can fire before this effect subscribes).
           if (!vid.paused && vid.currentTime > 0) return start();
-          if (waited >= 6000 || (waited >= 2500 && vid.networkState === 3)) return fallback();
+          if (waited >= 9000 || (waited >= 2500 && vid.networkState === 3)) return fallback();
           timers.push(setTimeout(() => watchdog(waited + 500), 500));
         };
         watchdog(0);
@@ -258,8 +263,7 @@ export function Intro({ video }: { video?: { sources: { src: string; type: strin
                 className="absolute inset-0 h-full w-full object-cover"
                 muted
                 playsInline
-                preload="auto"
-                poster={video.poster}
+                preload="none"
               >
                 {video.sources.map((v) => (
                   <source key={v.src} src={v.src} type={v.type} />

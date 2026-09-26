@@ -70,10 +70,10 @@ export async function listAnnouncements(limit = 10) {
   return db.select().from(announcements).orderBy(desc(announcements.createdAt)).limit(limit);
 }
 
-// Presentation slots: 10 min each, Session I 09:40–13:30, Session II 14:00–17:00.
+// Presentation slots: 10 min each, Session I 10:15–13:30, Session II 14:00–17:00.
 const SLOT = EVENT.slotMinutes.presentation + EVENT.slotMinutes.qna;
 const SESSIONS = [
-  { start: 9 * 60 + 40, end: 13 * 60 + 30, label: "Session I" },
+  { start: 10 * 60 + 15, end: 13 * 60 + 30, label: "Session I" },
   { start: 14 * 60, end: 17 * 60, label: "Session II" },
 ];
 

@@ -92,14 +92,14 @@ export const FLOW: FlowItem[] = [
   },
   {
     start: "09:30",
-    end: "09:40",
+    end: "10:15",
     title: "Event starts · Rules & regulations",
     detail: "Judging criteria, time limits and presentation order are announced.",
     kind: "talk",
     forTeams: "Hand your slides (PDF / PPTX) to the tech desk on a pen drive.",
   },
   {
-    start: "09:40",
+    start: "10:15",
     end: "13:30",
     title: "Presentations: Session I",
     detail: "Teams present in slot order: 7 min presentation + 3 min Q&A each.",

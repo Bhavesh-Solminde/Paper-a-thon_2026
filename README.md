@@ -26,7 +26,7 @@ Desk:      /admin → Scan QR (built-in camera scanner) → verified team → ti
 | | **Not Shortlisted** ("Better luck next time!") for every other team |
 
 Organisers only mark the shortlisted teams; everyone else is automatically "not shortlisted" when results go live.
-Shortlisted teams get a presentation order automatically. Each slot is 7 min + 3 min, so it's 10 minutes: Session I runs 9:40–1:30 and Session II runs 2:00–5:00. You can reorder with the `#` field in `/admin`.
+Shortlisted teams get a presentation order automatically. Each slot is 7 min + 3 min, so it's 10 minutes: Session I runs 10:15–1:30 and Session II runs 2:00–5:00. You can reorder with the `#` field in `/admin`.
 
 ## Event-day check-in (desk)
 

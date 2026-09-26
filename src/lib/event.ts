@@ -1,0 +1,171 @@
+// Single source of truth for event copy, dates and the schedule.
+// Edit here — the landing page, dashboard and emails all read from this file.
+
+export const EVENT = {
+  name: "Paper-a-thon",
+  club: "Microsoft Learn Students Club",
+  tagline: ["Fuel your curiosity.", "Shape the future."],
+  subTagline: "One paper at a time",
+  // All times are IST (+05:30)
+  eventStart: "2026-09-29T09:00:00+05:30",
+  eventEnd: "2026-09-29T17:30:00+05:30",
+  dateLabel: "29 September",
+  timeLabel: "9 AM – 5:30 PM",
+  venue: "Seminar Hall, Ground Floor",
+  hashtags: ["#PaperAthon", "#MLSCVCET"],
+  slotMinutes: { presentation: 7, qna: 3 },
+};
+
+export const TRACKS = [
+  "AI & Machine Learning",
+  "Cybersecurity & Privacy",
+  "IoT & Embedded Systems",
+  "Sustainability & Green Tech",
+  "HealthTech",
+  "Open Innovation",
+];
+
+export type Phase = {
+  key: string;
+  title: string;
+  date: string; // display label
+  at: string; // ISO — phase is "done" once this moment has passed
+  body: string;
+};
+
+// The road to event day. Dates before the 28th are placeholders — confirm with the organisers.
+export const PHASES: Phase[] = [
+  {
+    key: "register",
+    title: "Registration",
+    date: "Open now",
+    at: "2026-09-20T00:00:00+05:30",
+    body: "Form your team, pick a track and register. Your team lead's email becomes your login.",
+  },
+  {
+    key: "submit",
+    title: "Paper Submission",
+    date: "Before shortlisting",
+    at: "2026-09-22T00:00:00+05:30",
+    body: "Log in to your team dashboard and drop the link to your research paper. Status flips to Paper Submitted instantly.",
+  },
+  {
+    key: "shortlist",
+    title: "Shortlisting",
+    date: "Results on the site",
+    at: "2026-09-28T09:00:00+05:30",
+    body: "Our panel reviews every paper. Shortlisted teams light up on the public board and get a presentation slot.",
+  },
+  {
+    key: "seminar",
+    title: "Seminar",
+    date: "28 Sep",
+    at: "2026-09-28T10:00:00+05:30",
+    body: "A research-writing seminar by Sneha Ma'am — how to present, defend and publish your work.",
+  },
+  {
+    key: "eventday",
+    title: "Event Day",
+    date: "29 Sep",
+    at: "2026-09-29T09:00:00+05:30",
+    body: "Present your paper to the jury in the Seminar Hall. 7 minutes to pitch, 3 minutes to defend.",
+  },
+];
+
+export type FlowItem = {
+  start: string; // "09:00"
+  end?: string;
+  title: string;
+  detail: string;
+  kind: "ceremony" | "talk" | "presentations" | "break" | "wrap";
+  forTeams?: string; // what shortlisted teams should be doing
+};
+
+// Event Day — 29th
+export const FLOW: FlowItem[] = [
+  {
+    start: "09:00",
+    end: "09:30",
+    title: "Inauguration",
+    detail: "Lamp lighting, welcome address and a word from the faculty coordinators.",
+    kind: "ceremony",
+    forTeams: "Reach the Seminar Hall by 8:45, show your QR pass at the desk to check in.",
+  },
+  {
+    start: "09:30",
+    end: "09:40",
+    title: "Event starts · Rules & regulations",
+    detail: "Judging criteria, time limits and presentation order are announced.",
+    kind: "talk",
+    forTeams: "Hand your slides (PDF / PPTX) to the tech desk on a pen drive.",
+  },
+  {
+    start: "09:40",
+    end: "13:30",
+    title: "Presentations — Session I",
+    detail: "Teams present in slot order: 7 min presentation + 3 min Q&A each.",
+    kind: "presentations",
+    forTeams: "Your slot time is on your team dashboard. Be seated two slots early.",
+  },
+  {
+    start: "13:30",
+    end: "14:00",
+    title: "Break",
+    detail: "Lunch break. Jury deliberation on the morning session.",
+    kind: "break",
+  },
+  {
+    start: "14:00",
+    end: "17:00",
+    title: "Presentations — Session II",
+    detail: "Remaining teams present. Same format: 7 + 3 minutes.",
+    kind: "presentations",
+    forTeams: "Afternoon slots continue from where Session I stopped.",
+  },
+  {
+    start: "17:00",
+    title: "Winding up",
+    detail: "Final remarks from the jury while scores are tallied.",
+    kind: "wrap",
+  },
+  {
+    start: "17:00",
+    end: "17:30",
+    title: "Certificates & award ceremony",
+    detail: "Winners announced, prizes handed out, certificates for every presenting team.",
+    kind: "ceremony",
+    forTeams: "Stay till the end — certificates are handed out in person.",
+  },
+];
+
+export const FAQ = [
+  {
+    q: "Who can participate?",
+    a: "Everyone. Paper-a-thon is open to all students — any year, any branch.",
+  },
+  {
+    q: "How do we log in?",
+    a: "Pick your team from the list. We email a 6-digit code to your team lead's registered email. Enter it and you're in — no passwords.",
+  },
+  {
+    q: "How do we submit our paper?",
+    a: "From your team dashboard, paste a shareable link to your paper (Google Drive, Overleaf, OneDrive…). Make sure anyone with the link can view it.",
+  },
+  {
+    q: "How long is each presentation?",
+    a: "7 minutes of presentation followed by 3 minutes of questions from the jury — 10 minutes per team.",
+  },
+  {
+    q: "What is the QR pass for?",
+    a: "Download it from your dashboard and show it at the registration desk on the 29th. It carries your team details and lets volunteers check you in.",
+  },
+  {
+    q: "Can our paper get published?",
+    a: "Yes — standout papers get guidance and an opportunity to be published.",
+  },
+];
+
+/** Convert "HH:MM" on event day to a Date. */
+export function eventTime(hhmm: string) {
+  return new Date(`2026-09-29T${hhmm}:00+05:30`);
+}

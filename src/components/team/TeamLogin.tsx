@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { AnimatePresence, motion } from "motion/react";
+import { shortTrack, trackFilters } from "@/lib/event";
 import { requestOtp, verifyOtp } from "@/app/actions/auth";
 import { OtpInput } from "./OtpInput";
 
@@ -17,7 +18,7 @@ export function TeamLogin({ teams }: { teams: TeamRow[] }) {
   const [track, setTrack] = useState("All");
   const [selected, setSelected] = useState<TeamRow | null>(null);
 
-  const tracks = useMemo(() => ["All", ...Array.from(new Set(teams.map((t) => t.track))).sort()], [teams]);
+  const tracks = useMemo(() => trackFilters(teams.map((t) => t.track)), [teams]);
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     return teams.filter(
@@ -52,7 +53,7 @@ export function TeamLogin({ teams }: { teams: TeamRow[] }) {
                 track === t ? "border-blue bg-blue text-white" : "border-line text-paper/70 hover:border-paper/40"
               }`}
             >
-              {t}
+              {t === "All" ? t : shortTrack(t)}
             </button>
           ))}
         </div>
@@ -81,7 +82,7 @@ export function TeamLogin({ teams }: { teams: TeamRow[] }) {
                 <span className="min-w-0">
                   <span className="font-display text-[0.65rem] font-bold tracking-[0.25em] text-blue-bright">{t.id}</span>
                   <span className="mt-1 block truncate font-display text-lg font-black uppercase">{t.name}</span>
-                  <span className="mt-0.5 block truncate text-sm text-muted">{t.track}</span>
+                  <span className="mt-0.5 block truncate text-sm text-muted" title={t.track}>{shortTrack(t.track)}</span>
                 </span>
                 <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-line transition group-hover:border-blue group-hover:bg-blue">
                   →

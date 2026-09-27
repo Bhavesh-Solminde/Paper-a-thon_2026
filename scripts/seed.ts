@@ -4,6 +4,7 @@ import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import { announcements, teams } from "../src/lib/db/schema";
 import { pgConnection } from "../src/lib/db/url";
+import { TRACKS } from "../src/lib/event";
 
 config({ path: ".env.local" });
 config();
@@ -12,15 +13,16 @@ const conn = pgConnection(process.env.DATABASE_URL);
 const client = postgres(conn.url, { ...conn.options, max: 1 });
 const db = drizzle(client);
 
+const [HPC, SEC, GENAI] = TRACKS;
 const demo = [
-  ["Neural Nomads", "AI & Machine Learning", ["Aarav Shah", "Isha Patil", "Rohan Desai"]],
-  ["Cipher Circuit", "Cybersecurity & Privacy", ["Meera Nair", "Kabir Joshi"]],
-  ["Green Quill", "Sustainability & Green Tech", ["Tanvi Rao", "Dev Kulkarni", "Sara Khan", "Om Pawar"]],
-  ["Sensor Sapiens", "IoT & Embedded Systems", ["Aditya Iyer", "Nisha Gupta"]],
-  ["MedMatrix", "HealthTech", ["Pooja Menon", "Yash Chavan", "Riya Sawant"]],
-  ["Blank Page Club", "Open Innovation", ["Vihaan More", "Ananya Pillai"]],
-  ["Gradient Descent", "AI & Machine Learning", ["Kunal Bhatt", "Sneha Jadhav", "Arjun Rane"]],
-  ["Zero Trust Crew", "Cybersecurity & Privacy", ["Harsh Vora", "Diya Shetty"]],
+  ["Neural Nomads", GENAI, ["Aarav Shah", "Isha Patil", "Rohan Desai"]],
+  ["Cipher Circuit", SEC, ["Meera Nair", "Kabir Joshi"]],
+  ["Qubit Quill", HPC, ["Tanvi Rao", "Dev Kulkarni", "Sara Khan", "Om Pawar"]],
+  ["Parallel Minds", HPC, ["Aditya Iyer", "Nisha Gupta"]],
+  ["Aligned Agents", GENAI, ["Pooja Menon", "Yash Chavan", "Riya Sawant"]],
+  ["Lattice Labs", SEC, ["Vihaan More", "Ananya Pillai"]],
+  ["Gradient Descent", GENAI, ["Kunal Bhatt", "Sneha Jadhav", "Arjun Rane"]],
+  ["Zero Trust Crew", SEC, ["Harsh Vora", "Diya Shetty"]],
 ] as const;
 
 async function main() {

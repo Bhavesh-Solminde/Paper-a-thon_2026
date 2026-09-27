@@ -17,13 +17,41 @@ export const EVENT = {
 };
 
 export const TRACKS = [
-  "AI & Machine Learning",
-  "Cybersecurity & Privacy",
-  "IoT & Embedded Systems",
-  "Sustainability & Green Tech",
-  "HealthTech",
-  "Open Innovation",
-];
+  "High-Performance Computing, Parallel Systems & Quantum Software",
+  "Zero Trust Security, Post-Quantum Cryptography & Privacy Tech",
+  "Generative AI Systems, LLMOps & Alignment",
+] as const;
+
+/** Short labels for tight spots (filter chips, compact cards). */
+const TRACK_SHORT: Record<string, string> = {
+  [TRACKS[0]]: "HPC & Quantum",
+  [TRACKS[1]]: "Zero Trust & PQC",
+  [TRACKS[2]]: "GenAI & LLMOps",
+};
+export const shortTrack = (track: string) => TRACK_SHORT[track] ?? track;
+
+/** Filter chips for a list of teams: "All", then the tracks in use, in the official order. */
+export function trackFilters(used: string[]) {
+  const set = new Set(used);
+  const known: string[] = TRACKS.filter((t) => set.has(t));
+  const other = [...set].filter((t) => !known.includes(t)).sort();
+  return ["All", ...known, ...other];
+}
+
+/**
+ * Maps a free-text track (a Google Form export, an abbreviation) onto one of the three tracks.
+ * Returns null when nothing matches. Post-quantum is checked before quantum software on purpose.
+ */
+export function matchTrack(raw: string | null | undefined): (typeof TRACKS)[number] | null {
+  const t = (raw ?? "").trim().toLowerCase();
+  if (!t) return null;
+  const exact = TRACKS.find((x) => x.toLowerCase() === t);
+  if (exact) return exact;
+  if (/zero.?trust|post.?quantum|crypt|privacy|secur|pqc/.test(t)) return TRACKS[1];
+  if (/high.?perf|hpc|parallel|quantum|computing/.test(t)) return TRACKS[0];
+  if (/generative|gen.?ai|llm|alignment|\bai\b/.test(t)) return TRACKS[2];
+  return null;
+}
 
 export type Phase = {
   key: string;

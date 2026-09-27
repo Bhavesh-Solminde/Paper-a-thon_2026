@@ -62,10 +62,10 @@ In `/admin` → **Bulk import (CSV)**. You need a header row. Column order doesn
 
 ```csv
 team_name,track,leader_email,members
-Neural Nomads,AI & Machine Learning,lead@gmail.com,Aarav Shah;Isha Patil;Rohan Desai
+Neural Nomads,"Generative AI Systems, LLMOps & Alignment",lead@gmail.com,Aarav Shah;Isha Patil;Rohan Desai
 ```
 
-A Google Forms export works once you rename its columns to these names. Teams get IDs `PAT-001`, `PAT-002`, … in order.
+The three tracks are High-Performance Computing, Parallel Systems & Quantum Software; Zero Trust Security, Post-Quantum Cryptography & Privacy Tech; and Generative AI Systems, LLMOps & Alignment. Track names contain commas, so quote them in the CSV. Short forms like `HPC`, `Zero Trust`, `PQC` or `GenAI` are also recognised, and a row with an unknown track is rejected with a message. A Google Forms export works once you rename its columns to these names. Teams get IDs `PAT-001`, `PAT-002`, … in order.
 
 ## Entry animation (Higgsfield)
 

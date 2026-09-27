@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { motion } from "motion/react";
+import { shortTrack, trackFilters } from "@/lib/event";
 
 export type BoardTeam = {
   id: string;
@@ -14,7 +15,7 @@ export type BoardTeam = {
 export function ShortlistBoard({ teams }: { teams: BoardTeam[] }) {
   const [track, setTrack] = useState("All");
   const [q, setQ] = useState("");
-  const tracks = useMemo(() => ["All", ...Array.from(new Set(teams.map((t) => t.track))).sort()], [teams]);
+  const tracks = useMemo(() => trackFilters(teams.map((t) => t.track)), [teams]);
   const shown = teams.filter(
     (t) =>
       (track === "All" || t.track === track) &&
@@ -34,7 +35,7 @@ export function ShortlistBoard({ teams }: { teams: BoardTeam[] }) {
                 track === t ? "border-blue bg-blue text-white" : "border-line text-paper/70 hover:border-paper/40"
               }`}
             >
-              {t}
+              {t === "All" ? t : shortTrack(t)}
             </button>
           ))}
         </div>

@@ -119,8 +119,12 @@ async function renderTicket(pass: PassData): Promise<Blob> {
   ctx.font = `900 64px ${display}`;
   ctx.fillText(fit(ctx, pass.name.toUpperCase(), W - 120), W / 2, 1185);
   ctx.fillStyle = "#8b909b";
+  // Track names are long: shrink the type until it fits on one line.
+  let size = 32;
+  do ctx.font = `500 ${size}px ${display}`;
+  while (ctx.measureText(pass.track).width > W - 120 && --size > 22);
+  ctx.fillText(fit(ctx, pass.track, W - 120), W / 2, 1240);
   ctx.font = `500 32px ${display}`;
-  ctx.fillText(pass.track, W / 2, 1240);
   ctx.fillText(fit(ctx, pass.members.join(" · "), W - 120), W / 2, 1290);
 
   ctx.fillStyle = "#1f6bff";

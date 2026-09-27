@@ -9,6 +9,7 @@ import { getTeam, setSetting, type Settings } from "@/lib/data";
 import { parsePassQr, toCheckInTeam, type CheckInTeam } from "@/lib/checkin";
 import { clearAdminSession, isAdmin, passSignature, safeEqual, setAdminSession } from "@/lib/auth";
 import { parseCsv } from "@/lib/csv";
+import { matchTrack } from "@/lib/event";
 
 async function guard() {
   if (!(await isAdmin())) throw new Error("Unauthorized");
@@ -112,7 +113,17 @@ export async function deleteTeam(teamId: string) {
 
 const TeamInput = z.object({
   name: z.string().trim().min(1).max(80),
-  track: z.string().trim().min(1).max(80),
+  track: z
+    .string()
+    .nullish()
+    .transform((v, ctx) => {
+      const track = matchTrack(v);
+      if (!track) {
+        ctx.addIssue({ code: "custom", message: v?.trim() ? `Unknown track "${v.trim()}". Use one of the three event tracks.` : "Track is missing." });
+        return z.NEVER;
+      }
+      return track;
+    }),
   leaderEmail: z.string().trim().toLowerCase().email(),
   members: z.array(z.string().trim().min(1)).max(8),
 });
@@ -180,7 +191,7 @@ export async function importTeams(_prev: FormResult, form: FormData): Promise<Fo
   rows.slice(1).forEach((r, i) => {
     const parsed = TeamInput.safeParse({
       name: r[idx.name],
-      track: idx.track >= 0 ? r[idx.track] || "Open Innovation" : "Open Innovation",
+      track: idx.track >= 0 ? r[idx.track] : null,
       leaderEmail: r[idx.email],
       members: idx.members >= 0 ? (r[idx.members] ?? "").split(";").map((s) => s.trim()).filter(Boolean) : [],
     });

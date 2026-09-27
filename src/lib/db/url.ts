@@ -1,11 +1,9 @@
-import type { Options } from "postgres";
-
 // Connection strings from Supabase/Prisma setups carry query params meant for other drivers
 // (pgbouncer, uselibpqcompat, sslmode…). postgres-js would forward unknown params to the server
 // as settings and fail, so strip them and translate sslmode into the `ssl` option.
 const FOREIGN_PARAMS = ["pgbouncer", "uselibpqcompat", "sslmode", "connection_limit", "pool_timeout", "schema"];
 
-export function pgConnection(raw: string | undefined): { url: string; options: Options<Record<string, never>> } {
+export function pgConnection(raw: string | undefined): { url: string; options: { ssl: false | "require" } } {
   if (!raw) throw new Error("DATABASE_URL is not set");
   const u = new URL(raw);
   const sslmode = u.searchParams.get("sslmode");

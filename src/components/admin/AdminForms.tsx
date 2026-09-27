@@ -112,6 +112,10 @@ export function ImportForm() {
         <code className="text-paper">;</code>, lead first. Works with a Google Forms export after renaming columns.
       </p>
       <input name="file" type="file" accept=".csv,text/csv" required className="input file:mr-3 file:rounded-full file:border-0 file:bg-blue file:px-3 file:py-1 file:text-white" />
+      <label className="flex items-center gap-2 text-sm text-paper/80">
+        <input name="noPpt" type="checkbox" className="h-4 w-4 accent-[#1f6bff]" />
+        These teams haven&apos;t submitted a PPT
+      </label>
       <button className="btn btn-ghost w-full" disabled={pending}>{pending ? "Importing…" : "Import"}</button>
       <Result state={state} />
     </form>

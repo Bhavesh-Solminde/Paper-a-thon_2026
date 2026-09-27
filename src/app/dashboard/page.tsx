@@ -75,18 +75,36 @@ export default async function Dashboard() {
               <Link href="/shortlisted" className="text-blue-bright underline underline-offset-4">public board</Link>.
             </p>
           </section>
+        ) : status === "registered" ? (
+          <section className="card mt-6 flex items-center gap-4 p-6">
+            <span className="h-3 w-3 shrink-0 rounded-full bg-muted" />
+            <p className="text-paper/80">
+              Your team registered but didn&apos;t submit a PPT through the Google Form, so it wasn&apos;t part of the
+              shortlisting. You&apos;re welcome to come cheer the finalists on the 29th.
+            </p>
+          </section>
         ) : null}
 
-        <div className={`mt-6 grid gap-6 ${status === "not_shortlisted" ? "" : "lg:grid-cols-[1fr_22rem]"}`}>
+        <div className={`mt-6 grid gap-6 ${status === "under_review" || status === "shortlisted" ? "lg:grid-cols-[1fr_22rem]" : ""}`}>
           <div className="space-y-6">
             <div className="card p-6">
               <div className="flex items-center justify-between gap-4">
                 <p className="font-display text-xs font-bold uppercase tracking-[0.25em] text-muted">PPT submission</p>
-                <span className="rounded-full bg-ok/15 px-3 py-1 font-display text-[0.65rem] font-extrabold uppercase tracking-[0.15em] text-ok">
-                  ✓ Received
-                </span>
+                {status === "registered" ? (
+                  <span className="rounded-full border border-line px-3 py-1 font-display text-[0.65rem] font-extrabold uppercase tracking-[0.15em] text-muted">
+                    Not submitted
+                  </span>
+                ) : (
+                  <span className="rounded-full bg-ok/15 px-3 py-1 font-display text-[0.65rem] font-extrabold uppercase tracking-[0.15em] text-ok">
+                    ✓ Received
+                  </span>
+                )}
               </div>
-              <p className="mt-4 text-paper/80">Your presentation was submitted through the Google Form. Nothing else to upload.</p>
+              <p className="mt-4 text-paper/80">
+                {status === "registered"
+                  ? "We didn't receive a PPT from your team through the Google Form. Submissions are closed."
+                  : "Your presentation was submitted through the Google Form. Nothing else to upload."}
+              </p>
             </div>
 
             <div className="card p-6">
@@ -109,7 +127,7 @@ export default async function Dashboard() {
           {/* The pass is the entry ticket for event day, so only shortlisted teams get one. */}
           {status === "shortlisted" ? (
             <QrPass pass={passData(team, settings.resultsPublished)} />
-          ) : status !== "not_shortlisted" ? (
+          ) : status === "under_review" ? (
             <div className="card flex flex-col items-center justify-center p-6 text-center">
               <p className="font-display text-xs font-bold uppercase tracking-[0.25em] text-muted">Team pass</p>
               <p className="mt-4 text-sm text-paper/70">Your QR entry pass appears here if your team is shortlisted.</p>

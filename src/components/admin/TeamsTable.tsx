@@ -19,7 +19,8 @@ export type AdminTeam = CheckInTeam & {
 const FILTERS = [
   { key: "all", label: "All", match: () => true },
   { key: "shortlisted", label: "Shortlisted", match: (t: AdminTeam) => t.status === "shortlisted" },
-  { key: "others", label: "Not shortlisted", match: (t: AdminTeam) => t.status !== "shortlisted" },
+  { key: "others", label: "Not shortlisted", match: (t: AdminTeam) => t.status !== "shortlisted" && t.status !== "registered" },
+  { key: "noppt", label: "No PPT", match: (t: AdminTeam) => t.status === "registered" },
   { key: "present", label: "Present", match: (t: AdminTeam) => attendance(t.members).state === "present" },
   { key: "pending", label: "Pending", match: (t: AdminTeam) => attendance(t.members).state === "pending" },
 ] as const;
@@ -68,6 +69,9 @@ export function TeamsTable({ teams }: { teams: AdminTeam[] }) {
               <div className="flex flex-wrap items-center gap-2">
                 <span className="font-display text-xs font-bold tracking-widest text-blue-bright">{t.id}</span>
                 <span className="font-display font-black uppercase">{t.name}</span>
+                {t.status === "registered" && (
+                  <span className="rounded-full border border-line px-2 py-0.5 text-[0.6rem] font-bold uppercase tracking-wider text-muted">No PPT</span>
+                )}
                 {attendance(t.members).state !== "absent" && <AttendanceBadge members={t.members} />}
               </div>
               <p className="mt-1 truncate text-xs text-muted">
@@ -92,12 +96,14 @@ export function TeamsTable({ teams }: { teams: AdminTeam[] }) {
                   />
                 </label>
               )}
-              <button
-                className={`rounded-full px-3 py-1.5 text-xs font-bold uppercase ${t.status === "shortlisted" ? "bg-blue text-white" : "border border-line hover:border-blue"}`}
-                onClick={() => act(() => setTeamStatus(t.id, t.status === "shortlisted" ? "paper_submitted" : "shortlisted"))}
-              >
-                {t.status === "shortlisted" ? "★ Shortlisted" : "Shortlist"}
-              </button>
+              {t.status !== "registered" && (
+                <button
+                  className={`rounded-full px-3 py-1.5 text-xs font-bold uppercase ${t.status === "shortlisted" ? "bg-blue text-white" : "border border-line hover:border-blue"}`}
+                  onClick={() => act(() => setTeamStatus(t.id, t.status === "shortlisted" ? "paper_submitted" : "shortlisted"))}
+                >
+                  {t.status === "shortlisted" ? "★ Shortlisted" : "Shortlist"}
+                </button>
+              )}
               <button className="rounded-full border border-line px-3 py-1.5 text-xs font-bold uppercase hover:border-ok" onClick={() => setChecking(t)}>
                 {attendance(t.members).state === "absent" ? "Check in" : "Attendance"}
               </button>

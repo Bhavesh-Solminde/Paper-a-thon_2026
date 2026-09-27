@@ -178,6 +178,8 @@ export async function importTeams(_prev: FormResult, form: FormData): Promise<Fo
   await guard();
   const file = form.get("file");
   const text = file instanceof File ? await file.text() : String(form.get("csv") ?? "");
+  // Teams that registered but never sent a PPT are imported as "registered" (not in the shortlisting).
+  const status = form.get("noPpt") ? ("registered" as const) : ("paper_submitted" as const);
   const rows = parseCsv(text);
   if (rows.length < 2) return { error: "CSV needs a header row and at least one team." };
 
@@ -202,7 +204,7 @@ export async function importTeams(_prev: FormResult, form: FormData): Promise<Fo
   if (valid.length) {
     const ids = await nextIds(valid.length);
     await db.insert(teams).values(
-      valid.map((t, i) => ({ id: ids[i], name: t.name, track: t.track, leaderEmail: t.leaderEmail, members: toMembers(t.members), status: "paper_submitted" as const })),
+      valid.map((t, i) => ({ id: ids[i], name: t.name, track: t.track, leaderEmail: t.leaderEmail, members: toMembers(t.members), status })),
     );
   }
   refresh();

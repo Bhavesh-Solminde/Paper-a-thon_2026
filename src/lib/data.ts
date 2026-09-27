@@ -29,12 +29,14 @@ export type PublicStatus = TeamStatus | "under_review";
 // PPTs were submitted through the Google Form, so every team is under review until results are
 // published — then each team is either shortlisted or not.
 export function visibleStatus(team: Pick<Team, "status">, resultsPublished: boolean): PublicStatus {
+  // Registered but never submitted a PPT: not part of the shortlisting at all.
+  if (team.status === "registered") return "registered";
   if (!resultsPublished) return "under_review";
   return team.status === "shortlisted" ? "shortlisted" : "not_shortlisted";
 }
 
 export const STATUS_LABEL: Record<PublicStatus, string> = {
-  registered: "Registered",
+  registered: "No PPT submitted",
   paper_submitted: "PPT Submitted",
   under_review: "Under Review",
   shortlisted: "Shortlisted",

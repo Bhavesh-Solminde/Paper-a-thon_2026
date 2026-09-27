@@ -50,7 +50,7 @@ export function matchTrack(raw: string | null | undefined): (typeof TRACKS)[numb
   if (!t) return null;
   const exact = TRACKS.find((x) => x.toLowerCase() === t);
   if (exact) return exact;
-  if (/zero.?trust|post.?quantum|crypt|privacy|secur|pqc/.test(t)) return TRACKS[1];
+  if (/zero\W*trust|post.?quantum|crypt|privacy|secur|pqc/.test(t)) return TRACKS[1];
   if (/high.?perf|hpc|parallel|quantum|computing/.test(t)) return TRACKS[0];
   if (/generative|gen.?ai|llm|alignment|\bai\b/.test(t)) return TRACKS[2];
   return null;

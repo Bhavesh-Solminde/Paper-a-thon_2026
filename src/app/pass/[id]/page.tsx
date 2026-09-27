@@ -28,7 +28,7 @@ export default async function PassPage({ params, searchParams }: { params: Promi
           <p className="mt-5 font-display text-xs font-bold tracking-[0.3em] text-blue-bright">{team.id}</p>
           <h1 className="mt-1 font-display text-2xl font-black uppercase leading-tight">{team.name}</h1>
           <p className="mt-4 text-sm text-paper/70">
-            {status === "not_shortlisted"
+            {status === "not_shortlisted" || status === "registered"
               ? "This team wasn't shortlisted, so this is not a valid entry pass."
               : "Entry passes are issued once the shortlist is announced."}
           </p>

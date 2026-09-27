@@ -47,6 +47,14 @@ export async function setTeamStatus(teamId: string, status: TeamStatus) {
   refresh();
 }
 
+export async function setTeamTrack(teamId: string, track: string) {
+  await guard();
+  const clean = matchTrack(track);
+  if (!clean) throw new Error("Unknown track");
+  await db.update(teams).set({ track: clean }).where(eq(teams.id, teamId));
+  refresh();
+}
+
 export async function setPresentationOrder(teamId: string, order: number | null) {
   await guard();
   await db

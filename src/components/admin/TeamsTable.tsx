@@ -1,7 +1,8 @@
 "use client";
 
 import { useMemo, useState, useTransition } from "react";
-import { deleteTeam, setPresentationOrder, setTeamStatus } from "@/app/actions/admin";
+import { deleteTeam, setPresentationOrder, setTeamStatus, setTeamTrack } from "@/app/actions/admin";
+import { TRACKS, shortTrack } from "@/lib/event";
 import type { TeamStatus } from "@/lib/db/schema";
 import { attendance, type CheckInTeam } from "@/lib/checkin";
 import { AttendanceBadge, CheckInSheet } from "./CheckInSheet";
@@ -74,8 +75,22 @@ export function TeamsTable({ teams }: { teams: AdminTeam[] }) {
                 )}
                 {attendance(t.members).state !== "absent" && <AttendanceBadge members={t.members} />}
               </div>
-              <p className="mt-1 truncate text-xs text-muted">
-                {t.track} · {t.leaderEmail}
+              <p className="mt-1 flex min-w-0 items-center gap-1 text-xs text-muted">
+                <select
+                  className="max-w-[10rem] shrink-0 cursor-pointer rounded border border-line bg-ink px-1 py-0.5 text-xs text-paper/80 hover:border-blue"
+                  value={t.track}
+                  title={t.track}
+                  aria-label={`Track for ${t.name}`}
+                  onChange={(e) => act(() => setTeamTrack(t.id, e.target.value))}
+                >
+                  {!(TRACKS as readonly string[]).includes(t.track) && <option value={t.track}>{t.track}</option>}
+                  {TRACKS.map((tr) => (
+                    <option key={tr} value={tr}>
+                      {shortTrack(tr)}
+                    </option>
+                  ))}
+                </select>
+                <span className="truncate">· {t.leaderEmail}</span>
               </p>
               <p className="mt-1 truncate text-xs text-paper/70">{t.members.map((m) => m.name).join(", ")}</p>
             </div>

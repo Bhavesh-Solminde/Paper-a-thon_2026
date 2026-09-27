@@ -104,7 +104,7 @@ export function EventFlow({ announcements }: { announcements: Announcement[] }) 
               <div className="pb-5 text-2xl text-blue">=</div>
               <div>
                 <div className="text-5xl leading-none text-blue-bright">{slot.presentation + slot.qna}</div>
-                <div className="mt-1 text-[0.65rem] uppercase tracking-[0.2em] text-muted">min slot</div>
+                <div className="mt-1 text-[0.65rem] uppercase tracking-[0.2em] text-muted">min on stage</div>
               </div>
             </div>
             <div className="mt-5 flex h-2 overflow-hidden rounded-full">

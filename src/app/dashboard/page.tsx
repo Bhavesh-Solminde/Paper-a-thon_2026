@@ -77,7 +77,7 @@ export default async function Dashboard() {
           </section>
         ) : null}
 
-        <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_22rem]">
+        <div className={`mt-6 grid gap-6 ${status === "not_shortlisted" ? "" : "lg:grid-cols-[1fr_22rem]"}`}>
           <div className="space-y-6">
             <div className="card p-6">
               <div className="flex items-center justify-between gap-4">
@@ -106,7 +106,15 @@ export default async function Dashboard() {
             </div>
           </div>
 
-          <QrPass pass={passData(team, settings.resultsPublished)} />
+          {/* The pass is the entry ticket for event day, so only shortlisted teams get one. */}
+          {status === "shortlisted" ? (
+            <QrPass pass={passData(team, settings.resultsPublished)} />
+          ) : status !== "not_shortlisted" ? (
+            <div className="card flex flex-col items-center justify-center p-6 text-center">
+              <p className="font-display text-xs font-bold uppercase tracking-[0.25em] text-muted">Team pass</p>
+              <p className="mt-4 text-sm text-paper/70">Your QR entry pass appears here if your team is shortlisted.</p>
+            </div>
+          ) : null}
         </div>
       </main>
     </>

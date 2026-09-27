@@ -20,6 +20,23 @@ export default async function PassPage({ params, searchParams }: { params: Promi
   const slot = status === "shortlisted" ? slotFor(team.presentationOrder) : null;
   const att = attendance(team.members);
 
+  if (status !== "shortlisted" && !admin) {
+    return (
+      <main className="mx-auto flex min-h-dvh max-w-md flex-col justify-center px-4 py-10">
+        <div className="card p-8 text-center">
+          <Shield className="mx-auto h-14 w-12" />
+          <p className="mt-5 font-display text-xs font-bold tracking-[0.3em] text-blue-bright">{team.id}</p>
+          <h1 className="mt-1 font-display text-2xl font-black uppercase leading-tight">{team.name}</h1>
+          <p className="mt-4 text-sm text-paper/70">
+            {status === "not_shortlisted"
+              ? "This team wasn't shortlisted, so this is not a valid entry pass."
+              : "Entry passes are issued once the shortlist is announced."}
+          </p>
+        </div>
+      </main>
+    );
+  }
+
   return (
     <main className="mx-auto flex min-h-dvh max-w-md flex-col justify-center px-4 py-10">
       <div className="card overflow-hidden">

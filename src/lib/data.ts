@@ -70,8 +70,10 @@ export async function listAnnouncements(limit = 10) {
   return db.select().from(announcements).orderBy(desc(announcements.createdAt)).limit(limit);
 }
 
-// Presentation slots: 10 min each, Session I 10:15–13:30, Session II 14:00–17:00.
-const SLOT = EVENT.slotMinutes.presentation + EVENT.slotMinutes.qna;
+// Presentation slots: 15 min each, one every 20 min. Session I from 10:15 (last slot ends by 13:30),
+// Session II from 14:00. The admin "#" order decides who goes when.
+const SLOT = EVENT.slotLength;
+const STEP = EVENT.slotEvery;
 const SESSIONS = [
   { start: 10 * 60 + 15, end: 13 * 60 + 30, label: "Session I" },
   { start: 14 * 60, end: 17 * 60, label: "Session II" },
@@ -81,9 +83,9 @@ export function slotFor(order: number | null | undefined) {
   if (!order || order < 1) return null;
   let remaining = order - 1;
   for (const s of SESSIONS) {
-    const capacity = Math.floor((s.end - s.start) / SLOT);
+    const capacity = Math.floor((s.end - s.start - SLOT) / STEP) + 1;
     if (remaining < capacity) {
-      const start = s.start + remaining * SLOT;
+      const start = s.start + remaining * STEP;
       return { session: s.label, start: fmt(start), end: fmt(start + SLOT) };
     }
     remaining -= capacity;

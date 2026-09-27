@@ -14,6 +14,9 @@ export const EVENT = {
   venue: "Seminar Hall, Ground Floor",
   hashtags: ["#PaperAthon", "#MLSCVCET"],
   slotMinutes: { presentation: 7, qna: 3 },
+  // Timetable only (not shown as a rule): each team gets a 15-minute slot, and a new slot starts every 20 minutes.
+  slotLength: 15,
+  slotEvery: 20,
 };
 
 export const TRACKS = [

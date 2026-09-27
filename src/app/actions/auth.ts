@@ -97,7 +97,8 @@ export async function verifyOtp(teamId: string, code: string): Promise<OtpVerify
   redirect("/dashboard");
 }
 
-export async function logout() {
+export async function logout(form?: FormData) {
   await clearTeamSession();
-  redirect("/");
+  const next = form?.get("next");
+  redirect(next === "/login" ? "/login" : "/");
 }

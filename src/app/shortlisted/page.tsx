@@ -26,7 +26,7 @@ export default async function ShortlistedPage() {
             <span className="h-3 w-3 rounded-full bg-warn animate-pulse" />
             <h2 className="brush mt-6 text-4xl sm:text-6xl">Under review</h2>
             <p className="mt-4 max-w-md text-paper/70">
-              The panel is still reading every paper. The shortlist will be published here, so check back soon.
+              The panel is still reviewing every PPT. The shortlist will be published here, so check back soon.
             </p>
             <Link href="/login" className="btn btn-primary mt-8">Check my team status</Link>
           </div>
@@ -35,7 +35,7 @@ export default async function ShortlistedPage() {
         ) : (
           <>
             <p className="mt-4 max-w-xl text-paper/70">
-              {teams.length} teams will present on the 29th at the Seminar Hall. Presentation order is below: 7 minutes to
+              {teams.length} teams made it through the PPT round and will present on the 29th at the Seminar Hall. Presentation order is below: 7 minutes to
               present, 3 minutes of Q&amp;A.
             </p>
             <ShortlistBoard

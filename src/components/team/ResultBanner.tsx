@@ -37,10 +37,10 @@ export function ResultBanner({
         <span className="brush pointer-events-none absolute -right-4 -bottom-10 text-[10rem] leading-none text-white/10" aria-hidden>
           ✓
         </span>
-        <p className="font-display text-xs font-extrabold uppercase tracking-[0.35em] text-white/80">Results are out</p>
+        <p className="font-display text-xs font-extrabold uppercase tracking-[0.35em] text-white/80">PPT round results</p>
         <h2 className="brush mt-3 text-5xl text-white sm:text-7xl">You&apos;re shortlisted!</h2>
         <p className="mt-3 max-w-xl text-white/85">
-          Congratulations, {teamName}. See you on the 29th at the Seminar Hall. Bring your slides and your A-game.
+          Congratulations, {teamName}. Your PPT made the cut. See you on the 29th at the Seminar Hall. Bring your slides and your A-game.
         </p>
         {slot ? (
           <div className="mt-6 inline-flex flex-wrap items-center gap-x-4 gap-y-1 rounded-2xl bg-black/25 px-5 py-3">
@@ -63,11 +63,11 @@ export function ResultBanner({
       animate={{ opacity: 1, y: 0 }}
       className="relative overflow-hidden rounded-3xl border border-line bg-ink-2 p-7 sm:p-10"
     >
-      <p className="font-display text-xs font-extrabold uppercase tracking-[0.35em] text-muted">Results are out</p>
+      <p className="font-display text-xs font-extrabold uppercase tracking-[0.35em] text-muted">PPT round results</p>
       <h2 className="brush mt-3 text-4xl sm:text-6xl">Better luck next time!</h2>
       <p className="mt-3 max-w-xl text-paper/75">
-        {teamName} wasn&apos;t shortlisted this round, but writing a research paper is already a win most people never
-        attempt. Keep refining it, come cheer the finalists on the 29th, and bring it back stronger next time.
+        {teamName} wasn&apos;t shortlisted in the PPT round this time, but shaping a research idea is already a win most
+        people never attempt. Keep refining it, come cheer the finalists on the 29th, and bring it back stronger next time.
       </p>
       <p className="hand mt-4 text-3xl">Read · Analyse · Think · Write · Repeat</p>
     </motion.div>

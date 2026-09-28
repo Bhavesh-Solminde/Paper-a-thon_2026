@@ -12,8 +12,8 @@ PPT submissions were collected through a Google Form, so the site handles everyt
 Landing (/)  ──►  Team Login (/login)  ──►  pick team  ──►  6-digit code emailed to team lead (Resend)
                                                         ──►  enter code  ──►  Team Dashboard (/dashboard)
 Dashboard: profile card (name · members · track · status) → progress tracker → PPT received
-           → result (Shortlisted 🎉 + slot / "Better luck next time!") → download QR pass
-Public:    /shortlisted — every shortlisted team, members, track, presentation slot
+           → result (Shortlisted 🎉 / "Better luck next time!") → download QR pass
+Public:    /shortlisted — every shortlisted team, members, track (alphabetical, no running order)
 Organisers:/admin — import teams, mark shortlisted, publish results, announcements, check-in
 Desk:      /admin → Scan QR (built-in camera scanner) → verified team → tick members present
 ```
@@ -22,11 +22,11 @@ Desk:      /admin → Scan QR (built-in camera scanner) → verified team → ti
 
 | Before results are published | After **Publish results** in `/admin` |
 | --- | --- |
-| Under Review (PPT received via the Google Form) | **Shortlisted**, with their presentation slot, if marked in `/admin` |
+| Under Review (PPT received via the Google Form) | **Shortlisted**, with their QR pass, if marked in `/admin` |
 | | **Not Shortlisted** ("Better luck next time!") for every other team |
 
 Organisers only mark the shortlisted teams; everyone else is automatically "not shortlisted" when results go live.
-Shortlisted teams get a presentation order automatically. Teams present for 7 min + 3 min Q&A. The timetable gives each team a 15-minute slot, starting every 20 minutes: Session I from 10:15 (10 slots, last ends 1:30) and Session II from 2:00. You can reorder with the `#` field in `/admin`.
+Teams present for 7 min + 3 min Q&A. Presentation slots are never shown to teams: the running order is kept by the organisers (the `#` field in `/admin` is for your own use) and announced on the day.
 
 ## Event-day check-in (desk)
 

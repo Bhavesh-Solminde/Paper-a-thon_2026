@@ -4,7 +4,7 @@ import { Shield } from "@/components/ui/Shield";
 import { CheckInSheet } from "@/components/admin/CheckInSheet";
 import { attendance, toCheckInTeam } from "@/lib/checkin";
 import { isAdmin, passSignature, safeEqual } from "@/lib/auth";
-import { STATUS_LABEL, getSettings, getTeam, slotFor, visibleStatus } from "@/lib/data";
+import { STATUS_LABEL, getSettings, getTeam, visibleStatus } from "@/lib/data";
 
 export const metadata: Metadata = { title: "Team Pass", robots: { index: false } };
 export const dynamic = "force-dynamic";
@@ -17,7 +17,6 @@ export default async function PassPage({ params, searchParams }: { params: Promi
   const [team, settings, admin] = await Promise.all([getTeam(id), getSettings(), isAdmin()]);
   if (!team) notFound();
   const status = visibleStatus(team, settings.resultsPublished);
-  const slot = status === "shortlisted" ? slotFor(team.presentationOrder) : null;
   const att = attendance(team.members);
 
   if (status !== "shortlisted" && !admin) {
@@ -60,12 +59,6 @@ export default async function PassPage({ params, searchParams }: { params: Promi
               <dt className="text-xs font-bold uppercase tracking-wider text-muted">Status</dt>
               <dd className="mt-1 font-semibold">{STATUS_LABEL[status]}</dd>
             </div>
-            {slot && (
-              <div>
-                <dt className="text-xs font-bold uppercase tracking-wider text-muted">Presentation slot</dt>
-                <dd className="mt-1 font-semibold">{slot.start} to {slot.end} · {slot.session}</dd>
-              </div>
-            )}
             <div>
               <dt className="text-xs font-bold uppercase tracking-wider text-muted">Check-in</dt>
               <dd className={`mt-1 font-semibold ${att.state === "present" ? "text-ok" : att.state === "pending" ? "text-warn" : "text-muted"}`}>

@@ -7,11 +7,9 @@ import confetti from "canvas-confetti";
 export function ResultBanner({
   shortlisted,
   teamName,
-  slot,
 }: {
   shortlisted: boolean;
   teamName: string;
-  slot: { start: string; end: string; session: string } | null;
 }) {
   useEffect(() => {
     if (!shortlisted || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
@@ -42,17 +40,7 @@ export function ResultBanner({
         <p className="mt-3 max-w-xl text-white/85">
           Congratulations, {teamName}. Your PPT made the cut. See you on the 29th at the Seminar Hall. Bring your slides and your A-game.
         </p>
-        {slot ? (
-          <div className="mt-6 inline-flex flex-wrap items-center gap-x-4 gap-y-1 rounded-2xl bg-black/25 px-5 py-3">
-            <span className="font-display text-xs font-bold uppercase tracking-[0.25em] text-white/70">Your slot</span>
-            <span className="font-display text-2xl font-black text-white">
-              {slot.start} to {slot.end}
-            </span>
-            <span className="text-sm text-white/70">{slot.session}</span>
-          </div>
-        ) : (
-          <p className="mt-6 text-sm text-white/75">Your presentation slot will be announced soon.</p>
-        )}
+        <p className="mt-6 text-sm text-white/75">The presentation order will be announced at the event.</p>
       </motion.div>
     );
   }

@@ -67,7 +67,7 @@ export default async function AdminPage() {
         <SettingToggle
           name="resultsPublished"
           label="Publish results"
-          hint="Shortlisted teams see their slot; every other team sees “Not shortlisted”. The public board goes live."
+          hint="Shortlisted teams see the good news and get their QR pass; every other team sees “Not shortlisted”. The public board goes live."
           value={settings.resultsPublished}
         />
       </section>

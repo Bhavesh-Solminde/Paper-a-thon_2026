@@ -1,7 +1,6 @@
 import "server-only";
 import { asc, desc, eq } from "drizzle-orm";
 import { announcements, db, settings, teams, type Team, type TeamStatus } from "./db";
-import { EVENT } from "./event";
 
 export type Settings = { resultsPublished: boolean };
 
@@ -64,40 +63,10 @@ export async function listShortlisted() {
     .select()
     .from(teams)
     .where(eq(teams.status, "shortlisted"))
-    .orderBy(asc(teams.presentationOrder), asc(teams.name));
+    .orderBy(asc(teams.name)); // alphabetical: the running order stays with the organisers
   return rows;
 }
 
 export async function listAnnouncements(limit = 10) {
   return db.select().from(announcements).orderBy(desc(announcements.createdAt)).limit(limit);
-}
-
-// Presentation slots: 15 min each, one every 20 min. Session I from 10:15 (last slot ends by 13:30),
-// Session II from 14:00. The admin "#" order decides who goes when.
-const SLOT = EVENT.slotLength;
-const STEP = EVENT.slotEvery;
-const SESSIONS = [
-  { start: 10 * 60 + 15, end: 13 * 60 + 30, label: "Session I" },
-  { start: 14 * 60, end: 17 * 60, label: "Session II" },
-];
-
-export function slotFor(order: number | null | undefined) {
-  if (!order || order < 1) return null;
-  let remaining = order - 1;
-  for (const s of SESSIONS) {
-    const capacity = Math.floor((s.end - s.start - SLOT) / STEP) + 1;
-    if (remaining < capacity) {
-      const start = s.start + remaining * STEP;
-      return { session: s.label, start: fmt(start), end: fmt(start + SLOT) };
-    }
-    remaining -= capacity;
-  }
-  return null; // beyond capacity — organisers will announce
-}
-
-function fmt(mins: number) {
-  const h = Math.floor(mins / 60);
-  const m = mins % 60;
-  const h12 = ((h + 11) % 12) + 1;
-  return `${h12}:${m.toString().padStart(2, "0")} ${h < 12 ? "AM" : "PM"}`;
 }

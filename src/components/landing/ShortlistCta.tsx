@@ -11,7 +11,7 @@ export function ShortlistCta({ published, count }: { published: boolean; count: 
         </h2>
         <p className="mx-auto mt-4 max-w-xl text-ink/70">
           {published
-            ? "See every shortlisted team, their track, members and presentation slot for the 29th."
+            ? "See every shortlisted team, their track and members."
             : "Once the panel finishes reviewing, shortlisted teams will be announced right here. Keep your dashboard handy."}
         </p>
         <div className="mt-8 flex flex-wrap justify-center gap-3">

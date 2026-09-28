@@ -14,9 +14,6 @@ export const EVENT = {
   venue: "Seminar Hall, Ground Floor",
   hashtags: ["#PaperAthon", "#MLSCVCET"],
   slotMinutes: { presentation: 7, qna: 3 },
-  // Timetable only (not shown as a rule): each team gets a 15-minute slot, and a new slot starts every 20 minutes.
-  slotLength: 15,
-  slotEvery: 20,
 };
 
 export const TRACKS = [
@@ -133,9 +130,9 @@ export const FLOW: FlowItem[] = [
     start: "10:15",
     end: "13:30",
     title: "Presentations: Session I",
-    detail: "Teams present in slot order: 7 min presentation + 3 min Q&A each.",
+    detail: "Teams present one after another: 7 min presentation + 3 min Q&A each.",
     kind: "presentations",
-    forTeams: "Your slot time is on your team dashboard. Be seated two slots early.",
+    forTeams: "Stay in the hall. The organisers will call your team when it's your turn.",
   },
   {
     start: "13:30",
@@ -150,7 +147,7 @@ export const FLOW: FlowItem[] = [
     title: "Presentations: Session II",
     detail: "Remaining teams present. Same format: 7 + 3 minutes.",
     kind: "presentations",
-    forTeams: "Afternoon slots continue from where Session I stopped.",
+    forTeams: "Presentations continue from where Session I stopped.",
   },
   {
     start: "17:00",
@@ -177,7 +174,7 @@ export const FAQ = [
   },
   {
     q: "How do we know if we're shortlisted?",
-    a: "Log in to your team dashboard, or check the Shortlisted Teams board. Shortlisted teams also see their presentation slot for the 29th.",
+    a: "Log in to your team dashboard, or check the Shortlisted Teams board.",
   },
   {
     q: "How long is each presentation?",

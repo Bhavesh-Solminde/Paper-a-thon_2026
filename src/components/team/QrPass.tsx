@@ -132,7 +132,7 @@ async function renderTicket(pass: PassData): Promise<Blob> {
   ctx.fill();
   ctx.fillStyle = "#fff";
   ctx.font = `900 32px ${display}`;
-  ctx.fillText((pass.slot ? `SLOT ${pass.slot}` : pass.status).toUpperCase(), W / 2, 1392);
+  ctx.fillText(pass.status.toUpperCase(), W / 2, 1392);
 
   return new Promise((res) => c.toBlob((b) => res(b!), "image/png"));
 }

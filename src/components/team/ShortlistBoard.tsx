@@ -9,7 +9,6 @@ export type BoardTeam = {
   name: string;
   track: string;
   members: string[];
-  slot: string | null;
 };
 
 export function ShortlistBoard({ teams }: { teams: BoardTeam[] }) {
@@ -67,11 +66,6 @@ export function ShortlistBoard({ teams }: { teams: BoardTeam[] }) {
                 <li key={m} className="rounded-full bg-ink-3 px-3 py-1 text-xs text-paper/85">{m}</li>
               ))}
             </ul>
-            {t.slot && (
-              <p className="mt-5 border-t border-dashed border-line pt-4 font-display text-xs font-bold uppercase tracking-[0.15em] text-paper/70">
-                Presents at <span className="text-blue-bright">{t.slot}</span>
-              </p>
-            )}
           </motion.li>
         ))}
       </ul>

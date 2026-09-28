@@ -6,7 +6,7 @@ import { QrPass } from "@/components/team/QrPass";
 import { ResultBanner } from "@/components/team/ResultBanner";
 import { StatusBadge, StatusTracker } from "@/components/team/StatusTracker";
 import { getTeamSession } from "@/lib/auth";
-import { STATUS_LABEL, getSettings, getTeam, listAnnouncements, slotFor, visibleStatus } from "@/lib/data";
+import { STATUS_LABEL, getSettings, getTeam, listAnnouncements, visibleStatus } from "@/lib/data";
 import { passData } from "@/lib/pass";
 import { logout } from "@/app/actions/auth";
 
@@ -20,7 +20,6 @@ export default async function Dashboard() {
   if (!team) redirect("/login");
 
   const status = visibleStatus(team, settings.resultsPublished);
-  const slot = status === "shortlisted" ? slotFor(team.presentationOrder) : null;
 
   return (
     <>
@@ -65,7 +64,7 @@ export default async function Dashboard() {
 
         {status === "shortlisted" || status === "not_shortlisted" ? (
           <section className="mt-6">
-            <ResultBanner shortlisted={status === "shortlisted"} teamName={team.name} slot={slot} />
+            <ResultBanner shortlisted={status === "shortlisted"} teamName={team.name} />
           </section>
         ) : status === "under_review" ? (
           <section className="card mt-6 flex items-center gap-4 p-6">

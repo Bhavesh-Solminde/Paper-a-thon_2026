@@ -29,6 +29,13 @@
       "when": 1790656521413,
       "tag": "0003_readd_swanandi_to_nexus",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1790700000000,
+      "tag": "0004_remove_swanandi_from_nexus_again",
+      "breakpoints": true
     }
   ]
 }
